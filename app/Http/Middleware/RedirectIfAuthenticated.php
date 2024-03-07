@@ -21,16 +21,17 @@ class RedirectIfAuthenticated
 
         foreach ($guards as $guard) {
             if (Auth::guard($guard)->check()) {
-
-                if (Auth::user()->role === 'admin') {
-                    return to_route('admin.test')->with('success', 'You are logged in as an admin');
-                } elseif (Auth::user()->role === 'member') {
-                    return to_route('member.test')->with('success', 'You are logged in as a member');
-                } elseif (Auth::user()->role === 'organizer') {
-                    return to_route('organizer.test')->with('success', 'You are logged in as an organizer');
+                if (Auth::user()->role == 'admin') {
+                    return redirect()->route('admin.dashboard');
+                } else if (Auth::user()->role == 'member') {
+                    return redirect()->route('member.dashboard');
+                } else if (Auth::user()->role == 'organizer') {
+                    return redirect()->route('organizer.dashboard.index');
+                } else if (Auth::user()->role == 'user') {
+                    return redirect()->route('user.dashboard');
                 }
             }
+            return $next($request);
         }
-        return $next($request);
     }
 }

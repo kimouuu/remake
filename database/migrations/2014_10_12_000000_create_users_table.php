@@ -14,11 +14,14 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('name', 100);
-            $table->enum('role', ['admin', 'member', 'non-member', 'organizer'])->default('non-member');
-            $table->enum('gender', ['Male', 'Female']);
+            $table->string('fullname', 100)->nullable();
+            $table->enum('role', ['admin', 'member', 'non-member', 'organizer', 'user'])->default('user');
+            $table->enum('status', ['active', 'process', 'inactive', 'registerd', 'waiting'])->default('registerd');
+            $table->enum('gender', ['Male', 'Female'])->nullable();
             $table->date('date_birth')->nullable();
             $table->string('phone');
-            $table->string('email')->unique();
+            $table->timestamp('phone_verified_at')->nullable();
+            $table->string('email')->unique()->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->string('address', 100)->nullable();

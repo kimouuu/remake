@@ -2,13 +2,13 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     use HasApiTokens, HasFactory, Notifiable;
 
@@ -19,11 +19,15 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
+        'fullname',
         'email',
+        'email_verified_at',
         'password',
         'role',
         'gender',
+        'date_birth',
         'phone',
+        'phone_verified_at',
         'address',
         'province',
         'city',
@@ -31,6 +35,7 @@ class User extends Authenticatable
         'postal_code',
         'otp_code',
         'otp_expiry_time',
+        'status',
 
     ];
 
@@ -64,6 +69,10 @@ class User extends Authenticatable
         return $this->hasOne(UserDocuments::class, 'user_id');
     }
 
+    public function userDocument()
+    {
+        return $this->hasMany(UserDocuments::class, 'type_id');
+    }
     public function events()
     {
         return $this->belongsToMany(Event::class, 'event_data', 'user_id', 'event_id');
