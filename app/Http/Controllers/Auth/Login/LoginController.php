@@ -11,7 +11,7 @@ class LoginController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('guest')->except('logout');
+        // $this->middleware('guest')->except('logout');
     }
 
     public function login()
@@ -22,21 +22,29 @@ class LoginController extends Controller
     public function handleLogin(HandleLoginRequest $request)
     {
         $credentials = $request->validated();
-        $credentials = $request->only('email', 'password');
+        $phone = $request->input('phone');
+        $password = $request->input('password');
         $remember = $request->has('remember');
 
-        if (Auth::attempt($credentials, $remember)) {
+        if (Auth::attempt(['phone' => $phone, 'password' => $password], $remember)) {
             $request->session()->regenerate();
-            if (Auth::user()->role == 'admin') {
-                return view('admin.test')->with('success', 'You are logged in as an admin');
-            } elseif (Auth::user()->role === 'member') {
-                return view('member.test')->with('success', 'You are logged in as a member');
-            } elseif (Auth::user()->role === 'organizer') {
-                return view('organizer.test')->with('success', 'You are logged in as an organizer');
-            } else {
-                return back()->withErrors(['email' => 'The provided credentials do not match our records.']);
+
+            switch (Auth::user()->role) {
+                case 'admin':
+                    return redirect()->route('admin.dashboard')->with(['success' => 'Anda berhasil login']);
+                    break;
+                case 'member':
+                    return view('member.test')->with('success', 'You are logged in as a member');
+                    break;
+                case 'organizer':
+                    return view('organizer.test')->with('success', 'You are logged in as an organizer');
+                    break;
+                default:
+                    return back()->withErrors(['phone' => 'The provided credentials do not match our records.']);
             }
         }
+
+        return back()->withErrors(['phone' => 'The provided credentials do not match our records.']);
     }
 
     public function logout()

@@ -1,5 +1,11 @@
 <?php
 
+use App\Http\Controllers\Admin\Dashboard\DashboardController;
+use App\Http\Controllers\Admin\Setting\SettingController;
+use App\Http\Controllers\Admin\News\NewsController;
+use App\Http\Controllers\Admin\Event\EventController;
+use App\Http\Controllers\Admin\Profile\ProfileController;
+use App\Http\Controllers\Admin\UserDocumentType\DocumentTypeController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -16,9 +22,13 @@ use Illuminate\Support\Facades\Route;
 Route::group(['middleware' => 'auth'], function () {
     Route::group(['middleware' => 'can:role,"admin"'], function () {
         Route::prefix('admin')->as('admin.')->group(function () {
-            Route::get('/test', function () {
-                return view('admin.test');
-            });
+            Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+            Route::resource('events', EventController::class);
+            Route::resource('settings', SettingController::class);
+            Route::resource('news', NewsController::class);
+            Route::resource('document-types', DocumentTypeController::class);
+            Route::resource('profiles', ProfileController::class);
+            Route::patch('profiles/{user}/password', [ProfileController::class, 'updatePassword'])->name('profiles.updatePassword');
         });
     });
 });

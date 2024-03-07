@@ -33,7 +33,6 @@ class RegisterController extends Controller
         DB::transaction(function () use ($request, &$user, &$addUserOtp, $userOtp, $expiredAt) {
             $user = User::create([
                 'name' => $request->name,
-                'email' => $request->email,
                 'phone' => $request->phone,
                 'password' => $request->password,
             ]);
@@ -66,9 +65,7 @@ class RegisterController extends Controller
             $response = $client->post($url, [
                 'json' => $parameter
             ]);
-
-            $hashUserId = encrypt($user->id);
-            return redirect()->route('register.verificationOtp.index', $hashUserId);
+            return to_route('register.verificationOtp.index', $user->id);
         } catch (\Exception $e) {
             $errorMessage = $e->getMessage();
             return back()->with(['error' => "Gagal mengirim OTP, periksa koneksi internet anda dan nomor handphone yang dimasukkan lalu coba lagi."]);
