@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Auth\Register;
 
+use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 
 class ProfileUpdateRequest extends FormRequest
@@ -24,13 +25,13 @@ class ProfileUpdateRequest extends FormRequest
         return [
             'fullname' => 'required|string|max:100',
             // 'phone' => 'required|digits_between:10,13|unique:users,phone,' . auth()->id(),
-            'email' => 'required|string|email|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email,' . User::find($this->userId)->id,
             'gender' => 'required',
             'date_birth' => 'required|date',
-            'address' => 'required|string|max:255',
-            'province' => 'required|string|max:255',
-            'city' => 'required|string|max:255',
-            'district' => 'required|string|max:255',
+            'address' => 'required|string|max:100',
+            'province' => 'required|string|max:100',
+            'city' => 'required|string|max:100',
+            'district' => 'required|string|max:100',
             'postal_code' => 'required|digits:5',
 
         ];

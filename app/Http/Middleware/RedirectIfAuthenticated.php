@@ -25,6 +25,8 @@ class RedirectIfAuthenticated
                     return redirect()->route('admin.dashboard');
                 } else if (Auth::user()->role == 'member') {
                     return redirect()->route('member.dashboard');
+                } else if (Auth::user()->role == 'non-member') {
+                    return redirect()->route('non-member.dashboard');
                 } else if (Auth::user()->role == 'organizer') {
                     return redirect()->route('organizer.dashboard.index');
                 } else if (Auth::user()->role == 'user') {

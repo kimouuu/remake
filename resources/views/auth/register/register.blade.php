@@ -28,18 +28,18 @@
                     <div class="auth-logo">
                         <a href="index.html"><img src="./assets/compiled/svg/logo.svg" alt="Logo"></a>
                     </div>
-                    <h1 class="auth-title">Register</h1>
+                    <h1 class="auth-title">Daftar</h1>
                     <form action="{{ route('register') }}" method="post">
                         @csrf
                         <div class="form-group position-relative has-icon-left mb-4">
 
-                            <input type="text" class="form-control form-control-xl" name="name" placeholder="Name">
+                            <input type="text" class="form-control form-control-xl" name="name" placeholder="Nama Panggilan">
                             <div class="form-control-icon">
                                 <i class="bi bi-person"></i>
                             </div>
                         </div>
                         <div class="form-group position-relative has-icon-left mb-4">
-                            <input type="text" class="form-control form-control-xl" name="phone" placeholder="Phone">
+                            <input type="text" class="form-control form-control-xl" name="phone" placeholder="No. Handphone">
                              <div class="form-control-icon">
                                 <i class="bi bi-telephone"></i>
                             </div>
@@ -47,7 +47,7 @@
 
                         <div class="form-group position-relative has-icon-left mb-4">
                             <div class="input-group">
-                                <input type="password" class="form-control form-control-xl" name="password" id="passwordInput" placeholder="Password">
+                                <input type="password" class="form-control form-control-xl" name="password" id="passwordInput" placeholder="Kata Sandi">
                                 <span class="input-group-text" id="eyePosition" onclick="togglePasswordVisibility('passwordInput', 'eyeIcon')">
                                     <i id="eyeIcon" class="bi bi-eye-fill"></i>
                                 </span>
@@ -59,7 +59,7 @@
                         </div>
                         <div class="form-group position-relative has-icon-left mb-4">
                             <div class="input-group">
-                                <input type="password" class="form-control form-control-xl" name="password_confirmation" id="confirmPasswordInput" placeholder="Confirm Password">
+                                <input type="password" class="form-control form-control-xl" name="password_confirmation" id="confirmPasswordInput" placeholder="Konfirmasi Sandi">
                                 <span class="input-group-text" id="confirmEyePosition" onclick="togglePasswordVisibility('confirmPasswordInput', 'confirmEyeIcon')">
                                     <i id="confirmEyeIcon" class="bi bi-eye-fill"></i>
                                 </span>
@@ -70,7 +70,7 @@
 
                         </div>
 
-                        <button class="btn btn-primary btn-block btn-lg shadow-lg mt-5">Register</button>
+                        <button class="btn btn-primary btn-block btn-lg shadow-lg mt-5">Daftar</button>
                     </form>
                 </div>
             </div>

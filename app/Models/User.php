@@ -71,7 +71,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function userDocument()
     {
-        return $this->hasMany(UserDocuments::class, 'type_id');
+        return $this->hasMany(UserDocuments::class);
     }
     public function events()
     {

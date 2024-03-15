@@ -95,16 +95,14 @@
                             </a>
                         </li>
 
-{{--
 
-
-                        <li class="sidebar-item {{(request()->is('admin/routes*')) ? 'active' : ''}}">
-                            <a href="{{route('admin.routes.index')}}" class='sidebar-link'>
-                                <i class="bi bi-map-fill"></i>
-                                <span>Rute</span>
+                        <li class="sidebar-item {{(request()->is('admin/approved*')) ? 'active' : ''}}">
+                            <a href="{{route('admin.approved.index')}}" class='sidebar-link'>
+                                <i class="bi bi-check2-all"></i>
+                                <span>Approved</span>
                             </a>
                         </li>
-
+{{--
                         <li class="sidebar-item {{(request()->is('admin/pools*')) ? 'active' : ''}}">
                             <a href="{{route('admin.pools.index')}}" class='sidebar-link'>
                                 <i class="bi bi-geo-alt-fill"></i>

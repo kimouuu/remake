@@ -16,18 +16,22 @@
 <body>
     <script src="{{ asset('mazer/assets/static/js/initTheme.js') }}"></script>
     <div id="auth">
-
+        @if(session('success'))
+        <div class="alert alert-success" role="alert">
+            {{ session('success') }}
+        </div>
+    @endif
         <div class="row h-100">
             <div class="col-lg-5 col-12">
                 <div id="auth-left">
                     <div class="auth-logo">
                         <a href="#"></a>
                     </div>
-                    <h2 class="auth-title">Log in</h2>
+                    <h2 class="auth-title">Masuk</h2>
                     <form action="{{ route('login') }}" method="post">
                         @csrf
                         <div class="form-group position-relative has-icon-left mb-4">
-                            <input type="phone" name="phone" class="form-control form-control-xl" placeholder="Phone"
+                            <input type="phone" name="phone" class="form-control form-control-xl" placeholder="No. Handphone"
                                 required>
                             <div class="form-control-icon">
                                 <i class="bi bi-person"></i>
@@ -35,7 +39,7 @@
                         </div>
                         <div class="form-group position-relative has-icon-left mb-4">
                             <div class="input-group">
-                                <input type="password" class="form-control form-control-xl" name="password" id="passwordInput" placeholder="Password">
+                                <input type="password" class="form-control form-control-xl" name="password" id="passwordInput" placeholder="Kata Sandi">
                                 <span class="input-group-text" id="eyePosition" onclick="togglePasswordVisibility()">
                                     <i id="eyeIcon" class="bi bi-eye-fill"></i>
                                 </span>
@@ -44,19 +48,14 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="form-check form-check-lg d-flex align-items-end">
-                            <input class="form-check-input me-2" type="checkbox" id="flexCheckDefault" name="remember">
-                            <label class="form-check-label text-gray-600" for="flexCheckDefault">
-                                Keep me logged in
-                            </label>
-                        </div>
-                        <button type="submit" class="btn btn-primary btn-block btn-lg shadow-lg mt-2">Log in</button>
+
+                        <button type="submit" class="btn btn-primary btn-block btn-lg shadow-lg mt-2">Masuk</button>
                     </form>
                     <div class="text-center mt-3 text-lg fs-6 mb-1">
-                        <p class="text-gray-600">Don't have an account? <a href="{{ route('register') }}"
-                                class="font-bold">Sign up</a></p>
+                        <p class="text-gray-600">Tidak punya Akun? <a href="{{ route('register') }}"
+                                class="font-bold">Daftar</a></p>
                         <p>
-                        <a class="font-bold" href="#">Forgot password?</a>.</p>
+                        <a class="font-bold" href="#">Lupa password?</a>.</p>
                     </div>
                 </div>
             </div>

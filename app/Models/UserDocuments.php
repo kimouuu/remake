@@ -10,7 +10,7 @@ class UserDocuments extends Model
     use HasFactory;
     protected $fillable = [
         'user_id',
-        'type_id',
+        'user_document_type_id',
         'image',
     ];
     protected $table = 'user_documents';

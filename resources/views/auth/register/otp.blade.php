@@ -29,7 +29,7 @@
 
                     <!-- Display error message if exists -->
                     @if(session('error'))
-                        <div class="alert alert-danger mt-3">
+                        <div class="alert alert-danger mt-3" role="alert">
                             {{ session('error') }}
                         </div>
                     @endif
@@ -74,47 +74,52 @@
         </div>
     </div>
 
+    <!-- Di dalam dokumen HTML -->
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            var userId = '{{ $userId }}';
-            var censoredPhoneLink = document.getElementById('censoredPhoneLink');
-            var resendButton = document.getElementById('resendOtpButton');
-            var countdownElement = document.getElementById('countdown');
+            @if ($dataUserOtp)
+                var expiredAt = '{{ $dataUserOtp->expired_at }}'; // Ambil nilai expired_at dari variabel yang dikirim dari kontroler
+                var censoredPhoneLink = document.getElementById('censoredPhoneLink');
+                var resendButton = document.getElementById('resendOtpButton');
+                var countdownElement = document.getElementById('countdown');
 
-            function updateCountdown() {
-                var remainingTime = waitTime - (new Date() - lastSentTime);
-                var minutes = Math.floor(remainingTime / 60000); // 1 menit = 60000 milidetik
-                var seconds = Math.floor((remainingTime % 60000) / 1000);
+                function updateCountdown() {
+                    var remainingTime = new Date(expiredAt) - new Date();
+                    var minutes = Math.floor(remainingTime / (1000 * 60)); // Konversi milidetik ke menit
+                    var seconds = Math.floor((remainingTime % (1000 * 60)) / 1000); // Sisa waktu dalam detik
 
-                if (minutes <= 0 && seconds <= 0) {
-                    enableResendButton();
-                } else {
-                    countdownElement.style.display = 'block';
-                    countdownElement.innerText = 'Resend OTP in ' + minutes + ' menit ' + seconds + ' detik';
+                    if (minutes <= 0 && seconds <= 0) {
+                        enableResendButton();
+                    } else {
+                        countdownElement.style.display = 'block';
+                        countdownElement.innerText = 'Resend OTP in ' + minutes + ' menit ' + seconds + ' detik';
+                    }
                 }
-            }
 
-            function enableResendButton() {
-                resendButton.style.display = 'block';
-                resendButton.removeAttribute('disabled');
-                countdownElement.style.display = 'none';
-            }
+                function enableResendButton() {
+                    resendButton.style.display = 'block';
+                    resendButton.removeAttribute('disabled');
+                    countdownElement.style.display = 'none';
+                }
 
-            // Menggunakan data dari atribut HTML di dalam skrip JavaScript
-            censoredPhoneLink.innerText = '*Kode OTP terkirim ke ' + censoredPhoneLink.getAttribute('data-censored-phone') + ' via WhatsApp';
+                // Menggunakan data dari atribut HTML di dalam skrip JavaScript
+                censoredPhoneLink.innerText = '*Kode OTP terkirim ke ' + censoredPhoneLink.getAttribute('data-censored-phone') + ' via WhatsApp';
 
-            // Tambahkan countdown
-            var lastSentTime = new Date('{{ now() }}'); // Ganti ini dengan waktu pengiriman OTP yang benar
-            var waitTime = 5 * 60 * 1000; // 5 menit dalam milidetik
-            updateCountdown();
-            var countdownInterval = setInterval(updateCountdown, 1000);
+                // Tambahkan countdown
+                updateCountdown();
+                var countdownInterval = setInterval(updateCountdown, 1000);
 
-            // Hentikan interval countdown setelah 5 menit
-            setTimeout(function () {
-                clearInterval(countdownInterval);
-                enableResendButton();
-            }, waitTime);
+                // Hentikan interval countdown setelah waktu berakhir
+                setTimeout(function () {
+                    clearInterval(countdownInterval);
+                    enableResendButton();
+                }, new Date(expiredAt) - new Date());
+            @else
+                console.error('User OTP data is missing.');
+            @endif
         });
     </script>
+
+
 </body>
 </html>
