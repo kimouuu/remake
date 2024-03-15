@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('user_otps', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->nullable()->constrained('users')->cascadeOnDelete();
+            $table->enum('otp_type', ['email', 'whatsapp'])->default('whatsapp');
             $table->string('otp');
             $table->boolean('isVerified')->default('0');
             $table->timestamp('expired_at')->nullable();

@@ -10,6 +10,7 @@ class UserOtp extends Model
     use HasFactory;
     protected $fillable = [
         'user_id',
+        'otp_type',
         'otp',
         'isVerified',
         'expired_at',

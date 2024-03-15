@@ -23351,7 +23351,7 @@ body .bi:before,
 }
 
 .navbar.navbar-header .dropdown>a {
-    color: #6c757d;
+    color: #ffffff;
     font-weight: 600
 }
 
@@ -23429,7 +23429,7 @@ body .bi:before,
 }
 
 .layout-horizontal .main-navbar {
-    background-color: #435ebe;
+    background-color: orange;
     padding: 1rem
 }
 
@@ -23463,7 +23463,7 @@ body .bi:before,
 }
 
 .layout-horizontal .main-navbar ul>.menu-item .menu-link {
-    color: #dee2e6
+    color: white
 }
 
 .layout-horizontal .main-navbar ul>.menu-item.active a {
@@ -23543,12 +23543,12 @@ body .bi:before,
 
 .layout-horizontal .main-navbar .submenu .submenu-group .submenu-item a {
     padding: .6rem 2rem .6rem .6rem;
-    color: #6c757d;
+    color: orange;
     display: block
 }
 
 .layout-horizontal .main-navbar .submenu .submenu-group .submenu-item a:hover {
-    color: #187de4
+    color: orange
 }
 
 .layout-horizontal .main-navbar .submenu .submenu-group .submenu-item:hover .subsubmenu {
@@ -23579,7 +23579,7 @@ body .bi:before,
 
 @media screen and (max-width: 1199px) {
     .layout-horizontal .main-navbar {
-        background-color: #f5f7fc;
+        background-color: white;
         overflow: hidden;
         padding: 1rem;
         display: none

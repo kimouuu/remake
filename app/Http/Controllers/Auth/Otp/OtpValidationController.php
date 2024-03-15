@@ -13,6 +13,10 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use App\Http\Requests\Auth\Otp\OtpValidationRequest;
 use App\Http\Requests\Auth\Register\ProfileUpdateRequest;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 class OtpValidationController extends Controller
 {
@@ -117,7 +121,7 @@ class OtpValidationController extends Controller
                 // Redirect to the update profile page
                 return redirect()->route('register.verificationOtp.update', ['userId' => $userId])->with('success', 'Akun anda berhasil dibuat, silahkan lengkapi data diri anda. Terima kasih.');
             } else {
-                return back()->with(['failed' => "Periksa koneksi internet anda dan coba beberapa saat lagi."]);
+                return redirect()->back()->with('error', 'Otp tidak valid');
             }
         }
     }
@@ -131,26 +135,115 @@ class OtpValidationController extends Controller
 
     public function verified(ProfileUpdateRequest $request, $userId)
     {
-
         $user = User::findOrFail($userId);
-        $user->update([
-            'fullname' => $request->fullname,
-            'email' => $request->email,
-            'gender' => $request->gender,
-            'date_birth' => $request->date_birth,
-            'address' => $request->address,
-            'province' => $request->province,
-            'city' => $request->city,
-            'district' => $request->district,
-            'postal_code' => $request->postal_code,
-            'status' =>  'waiting',
+
+        DB::beginTransaction();
+        try {
+
+            $userOtp = UserOtp::updateOrCreate([
+                'user_id' => $user->id,
+                'otp_type' => 'email',
+            ], [
+                'user_id' => $user->id,
+                'otp' => str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT),
+                'otp_type' => 'email',
+                'expired_at' => now()->addMinutes(5),
+                'isVerified' => 0,
+            ]);
+
+            $user->update([
+                'fullname' => $request->fullname,
+                'email' => $request->email,
+                'gender' => $request->gender,
+                'date_birth' => $request->date_birth,
+                'address' => $request->address,
+                'province' => $request->province,
+                'city' => $request->city,
+                'district' => $request->district,
+                'postal_code' => $request->postal_code,
+                'status' =>  'waiting',
+            ]);
+
+            $user->refresh();
+            DB::commit();
+
+            // $user->sendEmailVerificationNotification();
+            Mail::to($user->email)->send(new \App\Mail\EmailOtpVerification($userOtp, $user));
+            return redirect()->route('register.verificationMailOtp.index', $user->id);
+
+
+            // return redirect()->route('auth.login')->with('success', 'Profil Anda berhasil diperbarui. Silahkan verifikasi alamat email Anda.');
+        } catch (\Throwable $th) {
+            Log::error($th);
+
+
+            DB::rollback();
+            return redirect()->back();
+        }
+    }
+
+    public function indexVerifiedMailOtp($userId)
+    {
+        $userOtp = UserOtp::query()->where('user_id', $userId)->where('otp_type', 'email')->latest()->first();
+        return view('auth.register.mail-otp', compact('userId', 'userOtp'));
+    }
+
+    public function verifyEmail(Request $request, $userId)
+    {
+        $request->validate([
+            'otp' => ['required', 'numeric'],
         ]);
 
-        if (!$user->hasVerifiedEmail()) {
-            $user->sendEmailVerificationNotification();
-            return redirect()->route('auth.login')->with('success', 'Profil Anda berhasil diperbarui. Silahkan verifikasi alamat email Anda.');
-        }
+        $user = User::findOrFail($userId);
 
-        return redirect()->route('auth.login')->with('success', 'Profil Anda berhasil diperbarui. Silahkan verifikasi alamat email Anda.');
+        $userOtp = UserOtp::query()->where('user_id', $userId)
+            ->where('otp', request()->otp)
+            ->where('otp_type', 'email')->first();
+
+        if ($userOtp) {
+            $userOtp->delete();
+
+            $user->update([
+                'email_verified_at' => now(),
+                'role' => 'non-member'
+            ]);
+
+            return redirect()->route('auth.login')->with('success', 'Email anda berhasil diverifikasi. Silahkan login.');
+        } else {
+            return redirect()->back()->with('error', 'Otp tidak valid');
+        }
+    }
+
+    public function resendEmailOtp($userId)
+    {
+        $user = User::findOrFail($userId);
+
+        DB::beginTransaction();
+        try {
+
+            $userOtp = UserOtp::updateOrCreate([
+                'user_id' => $user->id,
+                'otp_type' => 'email',
+            ], [
+                'user_id' => $user->id,
+                'otp' => str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT),
+                'otp_type' => 'email',
+                'expired_at' => now()->addMinutes(5),
+                'isVerified' => 0,
+            ]);
+
+            $user->refresh();
+            DB::commit();
+
+            // $user->sendEmailVerificationNotification();
+            Mail::to($user->email)->send(new \App\Mail\EmailOtpVerification($userOtp, $user));
+            return redirect()->back()->with('success', 'Berhasil mengirim ulang OTP ke email anda.');
+        } catch (\Throwable $th) {
+            Log::error($th);
+
+
+            DB::rollback();
+            return redirect()->back();
+        }
     }
 }

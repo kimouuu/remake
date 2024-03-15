@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name', 255);
             $table->enum('status', ['required', 'non-required']);
+            $table->enum('type', ['image', 'text']);
             $table->timestamps();
         });
     }

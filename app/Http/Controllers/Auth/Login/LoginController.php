@@ -32,13 +32,15 @@ class LoginController extends Controller
             switch (Auth::user()->role) {
                 case 'admin':
                     return redirect()->route('admin.dashboard')->with(['success' => 'Anda berhasil login']);
-                    break;
+
                 case 'member':
-                    return view('member.test')->with('success', 'You are logged in as a member');
-                    break;
+                    return redirect()->route('member.dashboard')->with(['success' => 'Anda berhasil login']);
+
+                case 'non-member':
+                    return redirect()->route('member.dashboard')->with(['success' => 'Anda berhasil login']);
+
                 case 'organizer':
                     return view('organizer.test')->with('success', 'You are logged in as an organizer');
-                    break;
                 default:
                     return back()->withErrors(['phone' => 'The provided credentials do not match our records.']);
             }
