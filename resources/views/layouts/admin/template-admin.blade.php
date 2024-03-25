@@ -102,14 +102,14 @@
                                 <span>Approved</span>
                             </a>
                         </li>
-{{--
-                        <li class="sidebar-item {{(request()->is('admin/pools*')) ? 'active' : ''}}">
-                            <a href="{{route('admin.pools.index')}}" class='sidebar-link'>
+
+                        <li class="sidebar-item {{(request()->is('admin/docs-approved*')) ? 'active' : ''}}">
+                            <a href="{{route('admin.docs-approved.index')}}" class='sidebar-link'>
                                 <i class="bi bi-geo-alt-fill"></i>
-                                <span>Pool</span>
+                                <span>Approved Dokumen</span>
                             </a>
                         </li>
-
+{{--
                         <li class="sidebar-item {{(request()->is('admin/drivers*')) ? 'active' : ''}}">
                             <a href="{{route('admin.drivers.index')}}" class='sidebar-link'>
                                 <i class="bi bi-people-fill"></i>

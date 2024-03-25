@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Member\Document;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class DocumentStoreRequest extends FormRequest
 {
@@ -22,7 +23,16 @@ class DocumentStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'image' => 'required|image|mimes:jpeg,png,jpg,svg|max:2048',
+            'user_document_type_id' => [
+                'required',
+                Rule::unique('user_documents', 'user_document_type_id')->where(function ($query) {
+                    return $query->where('user_id', auth()->id());
+                }),
+            ],
+            'input' => 'required_if:user_document_type_id,text',
+            'input_or_image' => 'required_if:user_document_type_id,image|mimes:jpg,png,jpeg|max:2048',
+            'verified_at' => 'nullable|date',
+            'verified_by' => 'nullable',
         ];
     }
 }

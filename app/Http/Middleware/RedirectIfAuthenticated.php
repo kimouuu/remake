@@ -26,11 +26,9 @@ class RedirectIfAuthenticated
                 } else if (Auth::user()->role == 'member') {
                     return redirect()->route('member.dashboard');
                 } else if (Auth::user()->role == 'non-member') {
-                    return redirect()->route('non-member.dashboard');
-                } else if (Auth::user()->role == 'organizer') {
-                    return redirect()->route('organizer.dashboard.index');
+                    return redirect()->route('member.dashboard');
                 } else if (Auth::user()->role == 'user') {
-                    return redirect()->route('user.dashboard');
+                    return redirect()->route('member.dashboard');
                 }
             }
             return $next($request);

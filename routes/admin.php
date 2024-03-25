@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\News\NewsController;
 use App\Http\Controllers\Admin\Event\EventController;
 use App\Http\Controllers\Admin\Profile\ProfileController;
 use App\Http\Controllers\Admin\UserApproved\ApprovedUserController;
+use App\Http\Controllers\Admin\DocumentApproved\ApprovedDocumentController;
 use App\Http\Controllers\Admin\UserDocumentType\DocumentTypeController;
 use Illuminate\Support\Facades\Route;
 
@@ -28,6 +29,8 @@ Route::group(['middleware' => 'auth'], function () {
             Route::resource('settings', SettingController::class);
             Route::resource('news', NewsController::class);
             Route::resource('document-types', DocumentTypeController::class);
+            Route::resource('docs-approved', ApprovedDocumentController::class);
+            Route::put('docs-approved/{id}', [ApprovedDocumentController::class, 'update'])->name('docs-approved.update');
             Route::resource('approved', ApprovedUserController::class);
             Route::put('approved/{id}', [ApprovedUserController::class, 'update'])->name('approved.update');
             Route::resource('profiles', ProfileController::class);
