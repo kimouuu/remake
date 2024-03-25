@@ -30,6 +30,8 @@ class LoginController extends Controller
             $request->session()->regenerate();
 
             switch (Auth::user()->role) {
+                case 'user':
+                    return redirect()->route('member.dashboard')->with(['success' => 'Anda berhasil login']);
                 case 'admin':
                     return redirect()->route('admin.dashboard')->with(['success' => 'Anda berhasil login']);
 

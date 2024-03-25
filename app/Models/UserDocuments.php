@@ -11,17 +11,24 @@ class UserDocuments extends Model
     protected $fillable = [
         'user_id',
         'user_document_type_id',
-        'image',
+        'input',
+        'verified_at',
+        'verified_by',
     ];
     protected $table = 'user_documents';
 
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class,);
     }
 
-    public function type()
+    public function verifiedBy()
     {
-        return $this->belongsTo(UserDocumentType::class);
+        return $this->belongsTo(User::class, 'verified_by');
+    }
+
+    public function types()
+    {
+        return $this->belongsTo(UserDocumentType::class, 'user_document_type_id');
     }
 }

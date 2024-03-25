@@ -2,8 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Member\Document\UserDocumentController;
-use App\Http\Controllers\NonMember\Dashboard\DashboardController;
-use App\Http\Controllers\NonMember\User\UserController;
+use App\Http\Controllers\Member\Dashboard\DashboardController;
 use App\Http\Controllers\NonMember\UserDocument\DocumentController;
 
 
@@ -20,13 +19,12 @@ use App\Http\Controllers\NonMember\UserDocument\DocumentController;
 
 
 Route::group(['middleware' => 'auth'], function () {
-    Route::group(['middleware' => 'can:role,"member","non-member"'], function () {
+    Route::group(['middleware' => 'can:role,"member","non-member","user"'], function () {
         Route::prefix('member')->as('member.')->group(function () {
             Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
             Route::resource('documents', UserDocumentController::class);
             Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
-            Route::resource('documents', DocumentController::class);
-            Route::post('/register', [UserController::class, 'register'])->name('user.register');
+            Route::post('/register', [DashboardController::class, 'register'])->name('dashboard.register');
         });
     });
 });

@@ -15,12 +15,13 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('user_document_type_id')->constrained('user_document_types')->onDelete('cascade');
-            $table->text('image');
+            $table->text('input')->nullable();
             $table->timestamp('verified_at')->nullable();
-            $table->foreignId('verified_by')->constrained('users')->onDelete('cascade');
+            $table->foreignId('verified_by')->nullable()->constrained('users');
             $table->timestamps();
         });
     }
+
 
     /**
      * Reverse the migrations.

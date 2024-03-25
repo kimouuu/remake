@@ -12,4 +12,9 @@ class UserDocumentType extends Model
         'name',
         'status'
     ];
+
+    public function userDocument()
+    {
+        return $this->hasMany(UserDocuments::class);
+    }
 }

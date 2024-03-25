@@ -20,7 +20,7 @@ class UserDocumentController extends Controller
         $docs = UserDocuments::all();
         $types = UserDocumentType::all();
         $setting = Setting::first();
-        return view('member.document.index', compact('docs'));
+        return view('member.document.index', compact('docs', 'types', 'setting'));
     }
 
     public function create()
@@ -39,28 +39,37 @@ class UserDocumentController extends Controller
                     return $query->where('user_id', $request->user()->id);
                 }),
             ],
+            'input_or_image' => 'required_if:user_document_type_id.*,2|mimes:jpg,png,jpeg|max:2048', // Sesuaikan dengan kebutuhan validasi Anda
         ]);
 
         $doc = new UserDocuments();
         $doc->user_id = $request->user()->id;
-        $doc->type_id = $request->type_id;
-        $doc->image = null;
-        $this->uploadImage($request, 'image', 'image', $doc);
+        $doc->user_document_type_id = $request->user_document_type_id;
+
+        // Memeriksa jenis input
+        if ($request->hasFile('input_or_image')) {
+            $imagePath = $this->uploadImage($request->file('input_or_image'), 'uploads/documents', $doc);
+            $doc->input = $imagePath;
+        } else {
+            $doc->input = $request->input('input_text');
+        }
+
         $doc->save();
 
-        return redirect()->route('member.documents.index')->with('success', 'Document created successfully.');
+        return redirect()->route('member.documents.index')->with('success', 'Document uploaded successfully.');
     }
 
-    private function uploadImage(Request $request, $inputName, $folder, $doc)
+
+    private function uploadImage($file, $folder, $doc)
     {
-        if ($request->hasFile($inputName)) {
-            $file = $request->file($inputName);
-            $slug = Str::slug($file->getClientOriginalName());
-            $newFileName = time() . '_' . $slug;
-            $file->move($folder . '/', $newFileName);
-            $doc->$inputName = $folder . '/' . $newFileName;
-        }
+        $slug = Str::slug($file->getClientOriginalName());
+        $newFileName = time() . '_' . $slug;
+        $file->move(public_path($folder), $newFileName); // Ubah jalur penyimpanan gambar
+        return $folder . '/' . $newFileName;
     }
+
+
+
 
     public function edit(UserDocuments $document)
     {
