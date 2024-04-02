@@ -9,31 +9,38 @@
                     <div class="card-body">
                         <form action="{{ route('member.documents.store') }}" method="post" enctype="multipart/form-data">
                             @csrf
+
                             <div class="form-group">
-                                <label for="user_document_type_id">Jenis Dokumen</label>
-                                <select name="user_document_type_id" id="user_document_type_id" class="form-control">
-                                    <option value="">Pilih Jenis Dokumen</option>
-                                    @foreach($types as $type)
-                                        <option value="{{ $type->id }}" data-type="{{ $type->type }}">{{ $type->name }}</option>
+                                <ul class="list-unstyled mb-0">
+                                    @foreach ($types as $type)
+                                        <li class="d-inline-block me-2 mb-1">
+                                            <div class="form-check">
+                                                <div class="checkbox">
+                                                    <input name="types[{{ $type->type }}]"
+                                                        value="{{ $type->id }}"
+                                                        data-type-name="{{ $type->name }}"
+                                                        data-type="{{ $type->type === 'image' ? 'file' : 'text' }}"
+                                                        type="checkbox" class="form-check-input"
+                                                    >
+                                                    <label for="type{{ $type->name }}">
+                                                        {{ $type->name }}
+                                                        @if($type->status === 'required')
+                                                            <span style="color: red">*</span>
+                                                        @endif
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </li>
                                     @endforeach
-                                </select>
-                                @error('user_document_type_id')
-                                    <div class="text-danger">{{ $message }}</div>
-                                @enderror
+                                    @error('types')
+                                        <div class="text-danger">{{ $message }}</div>
+                                    @enderror
+                                </ul>
                             </div>
 
-                            <div class="form-group" id="fileInputSection">
-                                <label for="input_or_image">Upload Dokumen</label>
-                                <input type="file" name="input_or_image" id="input_or_image" class="form-control">
-                                @error('input_or_image')
-                                    <div class="text-danger">{{ $message }}</div>
-                                @enderror
+                            <div class="form-group" id="inputContainer">
                             </div>
 
-                            <div class="form-group" id="textInputSection" style="display: none;">
-                                <label for="input_text">Input Text</label>
-                                <input type="text" name="input_text" id="input_text" class="form-control">
-                            </div>
 
                             <button type="submit" class="btn btn-primary">Submit</button>
                         </form>
@@ -65,6 +72,41 @@
                 }
             });
         });
+
+
     </script>
 
+    <script>
+        const checkboxInputs = document.querySelectorAll('input[type="checkbox"]');
+
+        checkboxInputs.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                displayInputs();
+            });
+        });
+
+        function displayInputs() {
+            const inputContainer = document.getElementById('inputContainer');
+            inputContainer.innerHTML = '';
+
+            checkboxInputs.forEach(checkbox => {
+                if (checkbox.checked) {
+                    const inputType = checkbox.getAttribute('data-type');
+                    const inputTypeName = checkbox.getAttribute('data-type-name');
+                    const label = document.createElement('label');
+                    label.textContent = `Input for ${inputTypeName}: `;
+                    const input = document.createElement('input');
+                    input.type = inputType === 'file' ? 'file' : 'text';
+                    input.name = inputType;
+                    input.classList.add('form-control');
+                    input.setAttribute('required', '');
+                    label.appendChild(input);
+                    inputContainer.appendChild(label);
+                    inputContainer.appendChild(document.createElement('br'), document.createElement('br'));
+                }
+            });
+        }
+
+        displayInputs();
+    </script>
 @endsection

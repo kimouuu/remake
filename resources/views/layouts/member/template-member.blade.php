@@ -28,26 +28,27 @@
                         </div>
                         <div class="header-top-right">
 
-                            <div class="dropdown">
-                                <a href="#" id="userDropdown" data-toggle="dropdown" >
-                                    <div class="user-menu d-flex">
-                                        <div class="user-name text-end me-3">
-                                            <h6 class="mb-0 text-gray-600">{{ Auth::user()->name }}</h6>
-                                        </div>
+
+                              <div class="dropdown">
+                                        <a href="#" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <div class="user-menu d-flex">
+                                                <div class="user-name text-end me-3">
+                                                    <h6 class="mb-0 text-gray-600">{{ Auth::user()->name }}</h6>
+                                                </div>
+                                            </div>
+                                        </a>
+                                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton" style="min-width: 11rem;">
+                                            <li>
+                                                <h6 class="dropdown-header">Hello, {{ Auth::user()->name }}</h6>
+                                            </li>
+                                            <li><a class="dropdown-item" href="{{ route('member.profiles.index') }}"><i class="icon-mid bi bi-person me-2"></i> My Profile</a></li>
+                                            <hr class="dropdown-divider">
+                                            </li>
+                                            <li><a class="dropdown-item" href="{{ route('logout') }}"><i class="icon-mid bi bi-box-arrow-left me-2"></i> Logout</a></li>
+                                        </ul>
                                     </div>
-                                </a>
-                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown" style="min-width: 11rem;">
-                                    <li>
-                                        <h6 class="dropdown-header">Hello, {{ Auth::user()->name }}</h6>
-                                    </li>
-                                    <li><a class="dropdown-item" href="#"><i class="icon-mid bi bi-person me-2"></i> My Profile</a></li>
-                                    <hr class="dropdown-divider">
-                                    <li><a class="dropdown-item" href="{{ route('logout') }}"><i class="icon-mid bi bi-box-arrow-left me-2"></i> Logout</a></li>
-                                </ul>
-                            </div>
 
 
-                            <!-- Burger button responsive -->
                             <a href="#" class="burger-btn d-block d-xl-none">
                                 <i class="bi bi-justify fs-3"></i>
                             </a>

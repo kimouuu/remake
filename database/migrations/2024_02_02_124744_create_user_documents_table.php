@@ -18,6 +18,7 @@ return new class extends Migration
             $table->text('input')->nullable();
             $table->timestamp('verified_at')->nullable();
             $table->foreignId('verified_by')->nullable()->constrained('users');
+            $table->string('reason', 255)->nullable();
             $table->timestamps();
         });
     }

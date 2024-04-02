@@ -31,6 +31,7 @@ Route::group(['middleware' => 'auth'], function () {
             Route::resource('document-types', DocumentTypeController::class);
             Route::resource('docs-approved', ApprovedDocumentController::class);
             Route::put('docs-approved/{id}', [ApprovedDocumentController::class, 'update'])->name('docs-approved.update');
+            Route::post('docs-approved/{id}/reject', [ApprovedDocumentController::class, 'reject'])->name('docs-approved.reject');
             Route::resource('approved', ApprovedUserController::class);
             Route::put('approved/{id}', [ApprovedUserController::class, 'update'])->name('approved.update');
             Route::resource('profiles', ProfileController::class);

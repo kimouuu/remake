@@ -12,12 +12,16 @@ use App\Models\Setting;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class UserDocumentController extends Controller
 {
     public function index()
     {
-        $docs = UserDocuments::all();
+        $docs = UserDocuments::when(auth()->user()->role !== 'admin', function ($query) {
+            $query->where('user_id', auth()->user()->id);
+        })->get();
+
         $types = UserDocumentType::all();
         $setting = Setting::first();
         return view('member.document.index', compact('docs', 'types', 'setting'));
@@ -30,31 +34,42 @@ class UserDocumentController extends Controller
         return view('member.document.create', compact('types'));
     }
 
-    public function store(DocumentStoreRequest $request)
+    public function store(Request $request)
     {
         $request->validate([
-            'user_document_type_id' => [
-                'required',
-                Rule::unique('user_documents', 'user_document_type_id')->where(function ($query) use ($request) {
-                    return $query->where('user_id', $request->user()->id);
-                }),
-            ],
-            'input_or_image' => 'required_if:user_document_type_id.*,2|mimes:jpg,png,jpeg|max:2048', // Sesuaikan dengan kebutuhan validasi Anda
+            'types' => 'required|array',
         ]);
 
-        $doc = new UserDocuments();
-        $doc->user_id = $request->user()->id;
-        $doc->user_document_type_id = $request->user_document_type_id;
 
-        // Memeriksa jenis input
-        if ($request->hasFile('input_or_image')) {
-            $imagePath = $this->uploadImage($request->file('input_or_image'), 'uploads/documents', $doc);
-            $doc->input = $imagePath;
-        } else {
-            $doc->input = $request->input('input_text');
-        }
+        DB::transaction(function () use ($request) {
+            foreach ($request->types as $key => $type) {
 
-        $doc->save();
+                if ($key === 'image') {
+                    $doc = new UserDocuments();
+                    $doc->user_id = $request->user()->id;
+                    $doc->user_document_type_id = $type;
+
+                    if ($request->has('file')) {
+                        $imagePath = $this->uploadImage($request->file('file'), 'uploads/documents', $doc);
+                        $doc->input = $imagePath;
+                    }
+
+                    $doc->save();
+                }
+
+                if ($key === 'text') {
+                    $doc = new UserDocuments();
+                    $doc->user_id = $request->user()->id;
+                    $doc->user_document_type_id = $type;
+
+                    if ($request->has('text')) {
+                        $doc->input = $request->input('text');
+                    }
+
+                    $doc->save();
+                }
+            }
+        });
 
         return redirect()->route('member.documents.index')->with('success', 'Document uploaded successfully.');
     }
@@ -73,28 +88,39 @@ class UserDocumentController extends Controller
 
     public function edit(UserDocuments $document)
     {
-        return view('member.document.edit', compact('document'));
+        $types = UserDocumentType::all();
+        return view('member.document.edit', compact('document', 'types'));
     }
 
-    public function update(DocumentUpdateRequest $request, UserDocuments $document)
+    public function update(Request $request, UserDocuments $document)
     {
-
-        $request->validate([
-            'user_document_type_id' => [
-                'required',
-                Rule::unique('user_documents', 'user_document_type_id')->where(function ($query) use ($request) {
-                    return $query->where('user_id', $request->user()->id);
-                })->ignore($request->id),
-            ],
+        // Validasi input
+        $validated = $request->validate([
+            'types' => 'required|string',
+            'input' => 'required', // Tidak perlu validasi spesifik untuk jenis input (teks atau gambar)
         ]);
 
-        $document->user_id = $request->user()->id;
-        $document->type_id = $request->type_id;
-        $document->image = null;
-        $this->updateImage($request, 'image', 'image', $document);
-        $document->save();
-        return redirect()->route('member.documents.index')->with('success', 'Document updated successfully.');
+        // Jika input adalah gambar, panggil fungsi untuk mengupdate gambar
+        if ($request->hasFile('input')) {
+            $this->updateImage($request, 'input', 'uploads/documents', $document);
+            $inputValue = $document->input; // Gunakan nilai yang sudah diupdate setelah proses
+        } else {
+            // Jika input bukan gambar, gunakan nilai teks yang diberikan
+            $inputValue = $request->input('input');
+        }
+
+        // Update data dokumen
+        $document->update([
+            'user_document_type_id' => $validated['types'],
+            'input' => $inputValue,
+            'verified_by' => null,
+            'reason' => null,
+        ]);
+
+        // Redirect dengan pesan sukses
+        return redirect()->route('member.documents.index')->with('success', 'Document updated successfully');
     }
+
 
     private function updateImage(Request $request, $inputName, $folder, $document)
     {
