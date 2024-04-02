@@ -55,7 +55,7 @@
                         <p class="text-gray-600">Tidak punya Akun? <a href="{{ route('register') }}"
                                 class="font-bold">Daftar</a></p>
                         <p>
-                        <a class="font-bold" href="#">Lupa password?</a>.</p>
+                        <a class="font-bold" href="{{ route('forgot') }}">Lupa password?</a>.</p>
                     </div>
                 </div>
             </div>

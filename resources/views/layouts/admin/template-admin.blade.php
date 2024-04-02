@@ -99,14 +99,14 @@
                         <li class="sidebar-item {{(request()->is('admin/approved*')) ? 'active' : ''}}">
                             <a href="{{route('admin.approved.index')}}" class='sidebar-link'>
                                 <i class="bi bi-check2-all"></i>
-                                <span>Approved</span>
+                                <span>Approval User</span>
                             </a>
                         </li>
 
                         <li class="sidebar-item {{(request()->is('admin/docs-approved*')) ? 'active' : ''}}">
                             <a href="{{route('admin.docs-approved.index')}}" class='sidebar-link'>
                                 <i class="bi bi-geo-alt-fill"></i>
-                                <span>Approved Dokumen</span>
+                                <span>Approval Dokumen</span>
                             </a>
                         </li>
 {{--

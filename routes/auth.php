@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\Forgot\ForgotPasswordController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Auth\Login\LoginController;
@@ -29,12 +30,12 @@ Route::middleware('guest')->group(function () {
     //Login
     Route::get('login', [LoginController::class, 'login'])->name('auth.login');
     Route::post('login', [LoginController::class, 'handleLogin'])->name('login');
-
-    //Register
-    Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
-    Route::post('/register', [RegisterController::class, 'register']);
+    Route::get('forgot', [ForgotPasswordController::class, 'forgot'])->name('forgot');
 });
 
+//Register
+Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
+Route::post('/register', [RegisterController::class, 'register']);
 Route::get('register/verification/{userId}', [OtpValidationController::class, 'index'])->name('register.verificationOtp.index');
 Route::get('register/verification/{userId}/show', [OtpValidationController::class, 'show'])->name('register.verificationOtp.show');
 Route::post('register/resend/{userId}', [OtpValidationController::class, 'resendOtpCode'])->name('register.verificationOtp.resendOtpCode');

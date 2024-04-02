@@ -5,13 +5,16 @@ namespace App\Http\Controllers\Admin\DocumentApproved;
 use App\Http\Controllers\Controller;
 use App\Models\UserDocuments;
 use App\Models\UserDocumentType;
+use App\Models\User;
+use App\Models\Setting;
+use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 
 class ApprovedDocumentController extends Controller
 {
     public function index()
     {
-        $docs = UserDocuments::where('verified_at', null)->get();
+        $docs = UserDocuments::where('verified_by', null)->get();
         return view('admin.document-approved.index', compact('docs'));
     }
 
@@ -23,11 +26,56 @@ class ApprovedDocumentController extends Controller
 
     public function update($id, Request $request)
     {
+        $setting = Setting::firstOrFail();
         $document = UserDocuments::findOrFail($id);
         $document->verified_at = now();
         $document->verified_by = $request->user()->id;
         $document->save();
 
+        $this->sendWhatsAppMessage($setting, $request, $id);
         return redirect()->back()->with('success', 'Document Approved Successfully');
+    }
+
+    public function reject($id, Request $request)
+    {
+        $setting = Setting::firstOrFail();
+        $document = UserDocuments::findOrFail($id);
+        $document->verified_at = null;
+        $document->verified_by = $request->user()->id;
+        $document->reason = $request->reason;
+        $document->save();
+
+        $this->sendWhatsAppMessage($setting, $request, $id);
+
+        return redirect()->back()->with('success', 'Document Rejected Successfully');
+    }
+
+    private function sendWhatsAppMessage($setting, Request $request, $id)
+    {
+        // Mendapatkan dokumen berdasarkan ID
+        $document = UserDocuments::find($id);
+
+        // Mendapatkan pengguna (user) berdasarkan ID pengguna (user_id) dalam dokumen
+        $user = User::findOrFail($document->user_id);
+
+        // Nomor telepon pengguna
+        $userPhone = $user->phone;
+
+        // Mengirim pesan WhatsApp
+        $client = new Client();
+        $response = $client->post($setting->endpoint, [
+            'form_params' => [
+                'api_key' => $setting->api_key,
+                'sender' => $setting->sender,
+                'number' => $userPhone, // Menggunakan nomor telepon pengguna
+                'message' => "Hallo, *$user->name*!\n" .
+                    "Kami dari *$setting->community_name*\n" .
+                    "Dokumen Anda " . ($document->verified_at ? 'diterima' : 'ditolak') . " oleh " . $request->user()->name . ". Alasan: " . ($document->reason ?? 'Tidak ada alasan')
+                    . " Terima Kasih"
+            ]
+        ]);
+
+        // Mengembalikan respons dari server
+        return $response->getBody()->getContents();
     }
 }

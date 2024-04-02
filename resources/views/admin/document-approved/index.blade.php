@@ -55,6 +55,33 @@
                                         @method('PUT')
                                         <button type="submit" class="btn btn-info">Approve</button>
                                     </form>
+                                    <a href="#" class="btn btn-danger" data-toggle="modal" data-target="#modalReject{{ $document->id }}">Reject</a>
+                                    <div class="modal fade" id="modalReject{{ $document->id }}" tabindex="-1" role="dialog" aria-labelledby="modalRejectLabel{{ $document->id }}" aria-hidden="true">
+                                        <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                            <h5 class="modal-title" id="modalRejectLabel{{ $document->id }}">Reject Dokumen</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                            </div>
+                                            <form action="{{ route('admin.docs-approved.reject', $document->id) }}" method="POST">
+                                            @csrf
+                                            <div class="modal-body">
+                                                <div class="form-group">
+                                                <label for="reason{{ $document->id }}">Alasan Penolakan</label>
+                                                <input type="text" class="form-control" id="reason{{ $document->id }}" name="reason" required>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                <button type="submit" class="btn btn-danger">Reject</button>
+                                            </div>
+                                            </form>
+                                        </div>
+                                        </div>
+                                    </div>
+
                                 </td>
 
                             </tr>

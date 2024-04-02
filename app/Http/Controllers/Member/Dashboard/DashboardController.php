@@ -19,16 +19,21 @@ class DashboardController extends Controller
     {
         $user = User::find(auth()->id());
 
-        // Ambil semua dokumen pengguna yang terkait dengan jenis dokumen yang diperlukan
-        $requiredDocument = $user->userDocument->filter(function ($document) {
-            return $document->types->status === 'required';
-        })->isNotEmpty();
-
-        if (!$requiredDocument) {
-            return redirect()->back()->with('error', 'Anda belum memiliki dokumen yang diperlukan.');
-        } else {
-            $user->update(['status' => 'process']);
-            return redirect()->route('member.dashboard')->with('success', 'Registrasi berhasil.');
+        $requiredDocumentTypes = UserDocumentType::where('status', 'required')->pluck('id');
+        $requiredDocuments = $user->userDocument()->whereIn('user_document_type_id', $requiredDocumentTypes)->get();
+        $requiredDocumentIds = $requiredDocuments->pluck('user_document_type_id')->toArray();
+        $missingRequiredDocuments = array_diff($requiredDocumentTypes->toArray(), $requiredDocumentIds);
+        if (!empty($missingRequiredDocuments)) {
+            return redirect()->back()->with('error', 'Belum semua dokumen yang diperlukan tersedia.');
         }
+        $allVerified = $requiredDocuments->every(function ($document) {
+            return !is_null($document->verified_at) && !empty($document->input);
+        });
+        if (!$allVerified) {
+            return redirect()->back()->with('error', 'Belum semua dokumen yang diperlukan terverifikasi atau terisi.');
+        }
+
+        $user->update(['status' => 'process']);
+        return redirect()->route('member.dashboard')->with('success', 'Registrasi berhasil.');
     }
 }
