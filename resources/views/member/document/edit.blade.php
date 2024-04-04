@@ -26,7 +26,7 @@
 
                         <div class="form-group">
                             <label for="types">Jenis Dokumen</label>
-                            <select name="types" id="types" class="form-select" disabled>
+                            <select name="types" id="types" class="form-select" >
                                 @foreach ($types as $type)
                                 <option value="{{ $type->id }}"
                                     {{ $document->user_document_type_id == $type->id ? 'selected' : '' }}>

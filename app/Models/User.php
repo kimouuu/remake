@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -76,5 +77,10 @@ class User extends Authenticatable implements MustVerifyEmail
     public function events()
     {
         return $this->belongsToMany(Event::class, 'event_data', 'user_id', 'event_id');
+    }
+
+    public function userOtp(): HasOne
+    {
+        return $this->hasOne(UserOtp::class, 'user_id', 'id');
     }
 }

@@ -31,6 +31,11 @@ Route::middleware('guest')->group(function () {
     Route::get('login', [LoginController::class, 'login'])->name('auth.login');
     Route::post('login', [LoginController::class, 'handleLogin'])->name('login');
     Route::get('forgot', [ForgotPasswordController::class, 'forgot'])->name('forgot');
+    Route::post('forgot', [ForgotPasswordController::class, 'sendOTP'])->name('forgot.send-otp');
+    Route::get('forgot/otp-verification/{user}', [ForgotPasswordController::class, 'formOtp'])->name('forgot.otp-verification');
+    Route::post('forgot/otp-verification/{user}/store', [ForgotPasswordController::class, 'verifyOTP'])->name('forgot.otp-verification.store');
+    Route::get('forgot/new-password/{token}/{user}', [ForgotPasswordController::class, 'indexResetPassword'])->name('password.reset');
+    Route::post('forgot/new-password/{token}/{user}/store', [ForgotPasswordController::class, 'doResetPassword'])->name('password.reset-store');
 });
 
 //Register

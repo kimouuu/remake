@@ -21,31 +21,26 @@ class LoginController extends Controller
 
     public function handleLogin(HandleLoginRequest $request)
     {
-        $credentials = $request->validated();
-        $phone = $request->input('phone');
-        $password = $request->input('password');
-        $remember = $request->has('remember');
+        $request->authenticate();
 
-        if (Auth::attempt(['phone' => $phone, 'password' => $password], $remember)) {
-            $request->session()->regenerate();
+        $request->session()->regenerate();
 
-            switch (Auth::user()->role) {
-                case 'user':
-                    return redirect()->route('member.dashboard')->with(['success' => 'Anda berhasil login']);
-                case 'admin':
-                    return redirect()->route('admin.dashboard')->with(['success' => 'Anda berhasil login']);
+        switch (Auth::user()->role) {
+            case 'user':
+                return redirect()->route('member.dashboard')->with(['success' => 'Anda berhasil login']);
+            case 'admin':
+                return redirect()->route('admin.dashboard')->with(['success' => 'Anda berhasil login']);
 
-                case 'member':
-                    return redirect()->route('member.dashboard')->with(['success' => 'Anda berhasil login']);
+            case 'member':
+                return redirect()->route('member.dashboard')->with(['success' => 'Anda berhasil login']);
 
-                case 'non-member':
-                    return redirect()->route('member.dashboard')->with(['success' => 'Anda berhasil login']);
+            case 'non-member':
+                return redirect()->route('member.dashboard')->with(['success' => 'Anda berhasil login']);
 
-                case 'organizer':
-                    return view('organizer.test')->with('success', 'You are logged in as an organizer');
-                default:
-                    return back()->withErrors(['phone' => 'The provided credentials do not match our records.']);
-            }
+            case 'organizer':
+                return view('organizer.test')->with('success', 'You are logged in as an organizer');
+            default:
+                return back()->withErrors(['phone' => 'The provided credentials do not match our records.']);
         }
 
         return back()->withErrors(['phone' => 'The provided credentials do not match our records.']);

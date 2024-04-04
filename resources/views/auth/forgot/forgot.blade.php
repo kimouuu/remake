@@ -28,7 +28,7 @@
                         <a href="#"></a>
                     </div>
                     <h2 class="auth-title">Lupa Password</h2>
-                    <form action="{{ route('forgot') }}" method="post">
+                    <form action="{{ route('forgot.send-otp') }}" method="post">
                         @csrf
                         <div class="form-group">
                             <label for="via" class="form-label">Via</label>
@@ -39,9 +39,9 @@
                         </div>
                         <div class="form-group" id="inputField">
                             <!-- Input field for email -->
-                            <input type="email" name="email" id="email" class="form-control" placeholder="Alamat Email" required>
+                            <input type="email" name="email" id="email" class="form-control" placeholder="Alamat Email">
                             <!-- Input field for phone number -->
-                            <input type="tel" name="phone" id="phone" class="form-control" placeholder="Nomor Handphone" required style="display: none;">
+                            <input type="number" name="phone" id="phone" class="form-control" placeholder="Nomor Handphone" style="display: none;">
                         </div>
                         <button type="submit" class="btn btn-primary btn-block btn-lg shadow-lg mt-2">Kirim</button>
                     </form>
@@ -67,9 +67,13 @@
                             var via = this.value;
                             if (via === "email") {
                                 document.getElementById("email").style.display = "block";
+                                document.getElementById("phone").disabled = true;
+                                document.getElementById("email").disabled = false;
                                 document.getElementById("phone").style.display = "none";
                             } else if (via === "phone") {
                                 document.getElementById("email").style.display = "none";
+                                document.getElementById("email").disabled = true;
+                                document.getElementById("phone").disabled = false;
                                 document.getElementById("phone").style.display = "block";
                             }
                         });
