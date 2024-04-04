@@ -93,10 +93,11 @@
                 </div>
             </div>
             <div class="col-lg-7 d-none d-lg-block">
-                <div id="auth-right" >
+                <div id="auth-right" class="d-flex justify-content-center align-items-center">
                     <h1 style="color: white;">Ayo isi Profile Anda!</h1>
                 </div>
             </div>
+
         </div>
     </div>
 

@@ -3,6 +3,6 @@
 
 This is your verification code OTP : {{ $userOtp->otp }}
 
-Thanks,<br>
+Thanks<br>
 {{ config('app.name') }}
 </x-mail::message>
