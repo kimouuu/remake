@@ -31,7 +31,7 @@
                     <form action="{{ route('login') }}" method="post">
                         @csrf
                         <div class="form-group position-relative has-icon-left mb-4">
-                            <input type="phone" name="phone" class="form-control form-control-xl" placeholder="No. Handphone"
+                            <input type="phone" name="phone" class="form-control form-control-xl" placeholder="No. Handphone/Email"
                                 required>
                             <div class="form-control-icon">
                                 <i class="bi bi-person"></i>
