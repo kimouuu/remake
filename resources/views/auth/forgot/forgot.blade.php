@@ -62,21 +62,18 @@
     </div>
     <script src="{{ asset('mazer/assets/compiled/js/app.js') }}"></script>
     <script>
-                        // Function to toggle visibility of input fields based on selected option
-                        document.getElementById("via").addEventListener("change", function() {
-                            var via = this.value;
-                            if (via === "email") {
-                                document.getElementById("email").style.display = "block";
-                                document.getElementById("phone").disabled = true;
-                                document.getElementById("email").disabled = false;
-                                document.getElementById("phone").style.display = "none";
-                            } else if (via === "phone") {
-                                document.getElementById("email").style.display = "none";
-                                document.getElementById("email").disabled = true;
-                                document.getElementById("phone").disabled = false;
-                                document.getElementById("phone").style.display = "block";
-                            }
-                        });
-                    </script>
+        // Function to toggle visibility of input fields based on selected option
+        document.getElementById("via").addEventListener("change", function() {
+            var via = this.value;
+            if (via === "email") {
+                document.getElementById("email").style.display = "block";
+                document.getElementById("phone").style.display = "none";
+            } else if (via === "phone") {
+                document.getElementById("phone").style.display = "block";
+                document.getElementById("email").style.display = "none";
+            }
+        });
+    </script>
+
 </body>
 </html>

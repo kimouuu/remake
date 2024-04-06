@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Member\Dashboard;
 
 use App\Http\Controllers\Controller;
+use App\Models\Setting;
 use App\Models\UserDocumentType;
 use App\Models\User;
+use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
@@ -34,6 +36,70 @@ class DashboardController extends Controller
         }
 
         $user->update(['status' => 'process']);
+
+        // Mengirim pesan WhatsApp kepada pengguna
+        $setting = Setting::firstOrFail();
+        $this->sendWhatsAppMessageToUser($setting, $user);
+        $this->sendWhatsAppMessageToAdmins($setting, $user);
+
         return redirect()->route('member.dashboard')->with('success', 'Registrasi berhasil.');
+    }
+
+    private function sendWhatsAppMessageToUser($setting, $user)
+    {
+        // Nomor telepon pengguna
+        $userPhone = $user->phone;
+
+        // Pesan untuk pengguna
+        $message = "Halo, *$user->name*!\n" .
+            "Kami dari *$setting->community_name* ingin memberitahukan bahwa akun Anda telah berhasil terdaftar, silahkan tunggu notifikasi selanjutnya!\n" . "Terima kasih.";
+
+        // Mengirim pesan WhatsApp
+        $client = new Client();
+        $response = $client->post($setting->endpoint, [
+            'form_params' => [
+                'api_key' => $setting->api_key,
+                'sender' => $setting->sender,
+                'number' => $userPhone,
+                'message' => $message
+            ]
+        ]);
+
+        // Mengembalikan respons dari server
+        return $response->getBody()->getContents();
+    }
+
+    private function sendWhatsAppMessageToAdmins($setting, $user)
+    {
+        // Mendapatkan semua pengguna dengan peran admin
+        $admins = User::where('role', 'admin')->get();
+
+        foreach ($admins as $admin) {
+            // Nomor telepon admin
+            $adminPhone = $admin->phone;
+
+            // Pesan untuk admin
+            $message = "Halo, Admin!\n" .
+                "Pengguna baru telah mendaftar dengan detail berikut:\n" .
+                "Nama: *$user->name*\n" .
+                "Nomor Handphone: $user->phone\n" .
+                "Peran: *$user->role*\n" .
+                "Silakan periksa dan proses permintaan mereka.\n" .
+                "Terima kasih.";
+
+            // Mengirim pesan WhatsApp
+            $client = new Client();
+            $response = $client->post($setting->endpoint, [
+                'form_params' => [
+                    'api_key' => $setting->api_key,
+                    'sender' => $setting->sender,
+                    'number' => $adminPhone,
+                    'message' => $message
+                ]
+            ]);
+
+            // Mengembalikan respons dari server
+            $response->getBody()->getContents();
+        }
     }
 }

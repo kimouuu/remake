@@ -39,23 +39,29 @@
                         <div class="form-group position-relative has-icon-left mb-4">
                             <input type="text" class="form-control form-control-xl" name="otp" placeholder="OTP">
                             <div class="form-control-icon">
-                                <i class="bi bi-whatsapp"></i>
+                                @if ($user->userOtp->otp_type == 'email')
+                                    <i class="bi bi-envelope"></i>
+                                @else
+                                    <i class="bi bi-whatsapp"></i>
+                                @endif
                             </div>
                         </div>
                         <button class="btn btn-primary btn-block btn-lg shadow-lg mt-3">Submit</button>
                     </form>
 
                     <p class="text-center mt-2" id="otpMessage">
-                        @php
-                            $censoredContact = ($user->userOtp->otp_type == 'email') ? $user->email : substr_replace($user->phone, '*****', -5);
-                        @endphp
-
                         @if ($user)
                             <span>
-                                *Kode OTP terkirim ke {{ $censoredContact }} via
+                                *Kode OTP terkirim ke
                                 @if ($user->userOtp->otp_type == 'email')
-                                    email.
-                                @elseif ($user->userOtp->otp_type == 'whatsapp')
+                                    {{ $user->email }}
+                                @else
+                                    {{ substr_replace($user->phone, '*****', -5) }}
+                                @endif
+                                via
+                                @if ($user->userOtp->otp_type == 'email')
+                                    Email.
+                                @else
                                     WhatsApp.
                                 @endif
                             </span>
@@ -65,7 +71,7 @@
                     <!-- Resend button and countdown -->
                     <form id="resendOtpForm" action="{{ route('register.verificationOtp.resendOtpCode', $user->id) }}" method="post">
                         @csrf
-                        <button id="resendOtpButton" class="btn btn-secondary btn-block btn-lg shadow-lg mt-3" disabled>Resend OTP</button>
+                        <button id="resendOtpButton" class="btn btn-secondary btn-block btn-lg shadow-lg mt-3">Resend OTP</button>
                         <p id="countdown" style="display: none;"></p>
                     </form>
                 </div>
@@ -83,7 +89,6 @@
         document.addEventListener('DOMContentLoaded', function () {
             @if ($user->userOtp)
                 var expiredAt = '{{ $user->userOtp->expired_at }}'; // Ambil nilai expired_at dari variabel yang dikirim dari kontroler
-                var censoredContact = document.getElementById('censoredContact');
                 var resendButton = document.getElementById('resendOtpButton');
                 var countdownElement = document.getElementById('countdown');
 
@@ -105,9 +110,6 @@
                     resendButton.removeAttribute('disabled');
                     countdownElement.style.display = 'none';
                 }
-
-                // Menggunakan data dari atribut HTML di dalam skrip JavaScript
-                censoredContact.innerText = '*Kode OTP terkirim ke ' + censoredContact.getAttribute('data-censored-contact') + ' via {{ $user->userOtp->otp_type }}';
 
                 // Tambahkan countdown
                 updateCountdown();

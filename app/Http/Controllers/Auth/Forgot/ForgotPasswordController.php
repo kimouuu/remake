@@ -10,6 +10,7 @@ use App\Mail\ResetPasswordMail;
 use App\Models\Setting;
 use GuzzleHttp\Client;
 use Carbon\Carbon;
+use Hamcrest\Core\Set;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Hash;
@@ -56,7 +57,6 @@ class ForgotPasswordController extends Controller
         return view('auth.forgot-password');
     }
 
-    // Proses mengirim OTP dan menampilkan form untuk memasukkan OTP
     public function sendOTP(Request $request)
     {
         $request->validate([
@@ -88,8 +88,9 @@ class ForgotPasswordController extends Controller
                 ],
                 [
                     'otp' => $otp,
-                    'expired_at' => $expiredAt
-                ]
+                    'expired_at' => $expiredAt,
+                    'otp_type' => $request->via == 'email' ? 'email' : 'whatsapp',
+                ],
             );
 
             DB::commit();
@@ -183,25 +184,62 @@ class ForgotPasswordController extends Controller
         return view('auth.forgot.new-password', compact('token', 'user'));
     }
 
-    public function doResetPAssword(Request $request, string $token, User $user)
+    public function doResetPassword(Request $request, string $token, User $user)
     {
         $userOtp = UserOtp::where('user_id', $user->id)
-            ->whereRelation('user', 'email', $token)
+            ->whereHas('user', function ($query) use ($token) {
+                $query->where('email', $token);
+            })
             ->where('isVerified', true)
             ->first();
 
         if (!$userOtp) {
-            return back()->withErrors('password', 'Token tidak valid.');
+            return back()->withErrors(['password' => 'Token tidak valid.']);
         }
 
         $request->validate([
             'password' => 'required|min:8|confirmed',
         ]);
 
-        $user->update([
-            'password' => $request->password,
-        ]);
+        if ($user instanceof \App\Models\User) {
+            $user->update([
+                'password' => bcrypt($request->password),
+            ]);
+        }
+
+        $this->sendWhatsAppMessage($user);
 
         return redirect()->route('login')->with('success', 'Password Anda berhasil direset. Silakan masuk dengan password baru Anda.');
+    }
+
+    private function sendWhatsAppMessage($user)
+    {
+        // Pastikan $user memiliki nomor telepon yang valid
+        $userPhone = $user->phone;
+        if (!$userPhone) {
+            return;
+        }
+
+        // Ambil setting dari userOtp
+        $setting = Setting::first();
+
+        // Pastikan $setting berisi objek Setting yang valid
+        if (!$setting) {
+            return;
+        }
+
+        // Mengirim pesan WhatsApp
+        $client = new Client();
+        $response = $client->post($setting->endpoint, [
+            'form_params' => [
+                'api_key' => $setting->api_key,
+                'sender' => $setting->sender,
+                'number' => $userPhone,
+                'message' => "Hallo $user->name\n" . "Kami dari $setting->community_name\n" . "Password Anda berhasil direset. Silakan masuk dengan password baru Anda."
+            ]
+        ]);
+
+        // Mengembalikan respons dari server
+        return $response->getBody()->getContents();
     }
 }

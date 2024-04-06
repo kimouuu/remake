@@ -43,15 +43,29 @@
                     <h2 class="auth-title">Reset Password</h2>
                     <form action="{{ route('password.reset-store', ['token' => $token, 'user' => $user->id]) }}" method="post">
                         @csrf
-                        <div class="form-group">
-                            <label for="password" class="form-label">Password Baru</label>
-                            <input type="password" name="password" id="password" class="form-control {{ $errors->has('password') ? 'is-invalid' : '' }}"
-                                placeholder="Password Baru">
+                        <div class="form-group position-relative has-icon-left mb-4">
+                            <div class="input-group">
+                                <input type="password" class="form-control form-control-xl" name="password" id="passwordInput" placeholder="Kata Sandi">
+                                <span class="input-group-text" id="eyePosition" onclick="togglePasswordVisibility('passwordInput', 'eyeIcon')">
+                                    <i id="eyeIcon" class="bi bi-eye-fill"></i>
+                                </span>
+                                <div class="form-control-icon">
+                                <i class="bi bi-lock"></i>
+                            </div>
+                            </div>
+
                         </div>
-                        <div class="form-group">
-                            <label for="password_confirmation" class="form-label">Konfirmasi Password Baru</label>
-                            <input type="password" name="password_confirmation" id="password_confirmation"
-                                class="form-control {{ $errors->has('password_confirmation') ? 'is-invalid' : '' }}" placeholder="Konfirmasi Password Baru">
+                        <div class="form-group position-relative has-icon-left mb-4">
+                            <div class="input-group">
+                                <input type="password" class="form-control form-control-xl" name="password_confirmation" id="confirmPasswordInput" placeholder="Konfirmasi Sandi">
+                                <span class="input-group-text" id="confirmEyePosition" onclick="togglePasswordVisibility('confirmPasswordInput', 'confirmEyeIcon')">
+                                    <i id="confirmEyeIcon" class="bi bi-eye-fill"></i>
+                                </span>
+                                <div class="form-control-icon">
+                                <i class="bi bi-lock"></i>
+                            </div>
+                            </div>
+
                         </div>
                         <button type="submit"
                             class="btn btn-primary btn-block btn-lg shadow-lg mt-2">Reset Password</button>
@@ -72,6 +86,22 @@
         </div>
     </div>
     <script src="{{ asset('mazer/assets/compiled/js/app.js') }}"></script>
+    <script>
+        function togglePasswordVisibility(inputId, iconId) {
+            var passwordInput = document.getElementById(inputId);
+            var eyeIcon = document.getElementById(iconId);
+
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                eyeIcon.classList.remove('bi-eye-fill');
+                eyeIcon.classList.add('bi-eye-slash-fill');
+            } else {
+                passwordInput.type = 'password';
+                eyeIcon.classList.remove('bi-eye-slash-fill');
+                eyeIcon.classList.add('bi-eye-fill');
+            }
+        }
+    </script>
 </body>
 
 </html>
