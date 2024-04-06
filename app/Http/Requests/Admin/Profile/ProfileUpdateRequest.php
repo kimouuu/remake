@@ -23,8 +23,14 @@ class ProfileUpdateRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255'],
-            'phone' => ['required', 'numeric', 'digits_between:10,13']
+            'fullname' => ['required', 'string', 'max:255'],
+            'date_birth' => ['required', 'date'],
+            'address' => ['required', 'string'],
+            'province' => ['required', 'string'],
+            'city' => ['required', 'string'],
+            'district' => ['required', 'string'],
+            'postal_code' => ['required', 'string'],
+
         ];
     }
 }

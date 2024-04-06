@@ -79,7 +79,7 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->belongsToMany(Event::class, 'event_data', 'user_id', 'event_id');
     }
 
-    public function userOtp(): HasOne
+    public function userOtp()
     {
         return $this->hasOne(UserOtp::class, 'user_id', 'id');
     }

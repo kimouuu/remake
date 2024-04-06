@@ -32,7 +32,7 @@ class ApprovedDocumentController extends Controller
         $document->verified_by = $request->user()->id;
         $document->save();
 
-        $this->sendWhatsAppMessage($setting, $request, $id);
+        $this->sendWhatsAppMessage($setting, $request, $id, true);
         return redirect()->back()->with('success', 'Document Approved Successfully');
     }
 
@@ -45,12 +45,12 @@ class ApprovedDocumentController extends Controller
         $document->reason = $request->reason;
         $document->save();
 
-        $this->sendWhatsAppMessage($setting, $request, $id);
+        $this->sendWhatsAppMessage($setting, $request, $id, false);
 
         return redirect()->back()->with('success', 'Document Rejected Successfully');
     }
 
-    private function sendWhatsAppMessage($setting, Request $request, $id)
+    private function sendWhatsAppMessage($setting, Request $request, $id, $isApproved)
     {
         // Mendapatkan dokumen berdasarkan ID
         $document = UserDocuments::find($id);
@@ -61,6 +61,17 @@ class ApprovedDocumentController extends Controller
         // Nomor telepon pengguna
         $userPhone = $user->phone;
 
+        // Tentukan pesan berdasarkan apakah dokumen disetujui atau ditolak
+        if ($isApproved) {
+            $message = "Hallo, *$user->name*!\n" .
+                "Kami dari *$setting->community_name*\n" .
+                "Dokumen Anda diterima oleh " . $request->user()->name . ". Terima Kasih";
+        } else {
+            $message = "Hallo, *$user->name*!\n" .
+                "Kami dari *$setting->community_name*\n" .
+                "Dokumen Anda ditolak oleh " . $request->user()->name . ". Alasan: " . ($document->reason ?? 'Tidak ada alasan') . ". Terima Kasih";
+        }
+
         // Mengirim pesan WhatsApp
         $client = new Client();
         $response = $client->post($setting->endpoint, [
@@ -68,10 +79,7 @@ class ApprovedDocumentController extends Controller
                 'api_key' => $setting->api_key,
                 'sender' => $setting->sender,
                 'number' => $userPhone, // Menggunakan nomor telepon pengguna
-                'message' => "Hallo, *$user->name*!\n" .
-                    "Kami dari *$setting->community_name*\n" .
-                    "Dokumen Anda " . ($document->verified_at ? 'diterima' : 'ditolak') . " oleh " . $request->user()->name . ". Alasan: " . ($document->reason ?? 'Tidak ada alasan')
-                    . " Terima Kasih"
+                'message' => $message
             ]
         ]);
 

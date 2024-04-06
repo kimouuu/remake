@@ -13,6 +13,11 @@
                         <td>{{ $user->name }}</td>
                     </tr>
                     <tr>
+                        <th scope="row">Nama Lengkap</th>
+                        <td>:</td>
+                        <td>{{ $user->fullname }}</td>
+                    </tr>
+                    <tr>
                         <th scope="row">No. Telp</th>
                         <td>:</td>
                         <td>{{ $user->phone }}</td>
@@ -22,6 +27,19 @@
                         <td>:</td>
                         <td>{{ $user->email }}</td>
                     </tr>
+                    <tr>
+                        <th scope="row">Tanggal Lahir</th>
+                        <td>:</td>
+                        <td>{{ $user->date_birth }}</td>
+                    </tr>
+
+                    <tr>
+                        <th scope="row">Alamat</th>
+                        <td>:</td>
+                        <td>{{ $user->address }}, {{ $user->province }}, {{ $user->city }}, {{ $user->district }}, {{ $user->postal_code }}</td>
+                    </tr>
+
+
                 </tbody>
             </table>
             <div class="p-2">
