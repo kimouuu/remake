@@ -14,14 +14,16 @@ class ApprovedDocumentController extends Controller
 {
     public function index()
     {
+        $setting = Setting::firstOrFail();
         $docs = UserDocuments::where('verified_by', null)->get();
-        return view('admin.document-approved.index', compact('docs'));
+        return view('admin.document-approved.index', compact('docs', 'setting'));
     }
 
     public function show($id)
     {
         $doc = UserDocuments::find($id);
-        return view('admin.document-approved.show', compact('doc'));
+        $setting = Setting::firstOrFail();
+        return view('admin.document-approved.show', compact('doc', 'setting'));
     }
 
     public function update($id, Request $request)

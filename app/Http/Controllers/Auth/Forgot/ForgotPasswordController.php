@@ -22,12 +22,14 @@ class ForgotPasswordController extends Controller
 {
     public function forgot()
     {
-        return view('auth.forgot.forgot');
+        $setting = Setting::firstOrFail();
+        return view('auth.forgot.forgot', compact('setting'));
     }
 
     public function showResetForm(Request $request)
     {
-        return view('auth.forgot.new-password');
+        $setting = Setting::firstOrFail();
+        return view('auth.forgot.new-password', compact('setting'));
     }
 
     public function resetPassword(Request $request)
@@ -54,7 +56,8 @@ class ForgotPasswordController extends Controller
 
     public function showForm()
     {
-        return view('auth.forgot-password');
+        $setting = Setting::firstOrFail();
+        return view('auth.forgot-password', compact('setting'));
     }
 
     public function sendOTP(Request $request)
@@ -110,7 +113,8 @@ class ForgotPasswordController extends Controller
 
     public function formOtp(Request $request, User $user): View
     {
-        return view('auth.forgot.otp-forgot', compact('user'));
+        $setting = Setting::firstOrFail();
+        return view('auth.forgot.otp-forgot', compact('user', 'setting'));
     }
 
     // Proses verifikasi OTP
@@ -180,8 +184,8 @@ class ForgotPasswordController extends Controller
         if (!$userOtp) {
             return to_route('forgot')->with('error', 'Token tidak valid.');
         }
-
-        return view('auth.forgot.new-password', compact('token', 'user'));
+        $setting = Setting::firstOrFail();
+        return view('auth.forgot.new-password', compact('token', 'user', 'setting'));
     }
 
     public function doResetPassword(Request $request, string $token, User $user)

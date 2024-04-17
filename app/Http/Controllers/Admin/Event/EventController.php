@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin\Event;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Event\EventUpdateRequest;
 use App\Models\Event;
+use App\Models\Setting;
 use App\Http\Requests\Admin\Event\EventStoreRequest;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -14,18 +15,21 @@ class EventController extends Controller
 
     public function index()
     {
+        $setting = Setting::firstOrFail();
         $events = Event::all();
-        return view('admin.event.index', compact('events'));
+        return view('admin.event.index', compact('events', 'setting'));
     }
 
     public function show(Event $event)
     {
         $event = Event::find($event->id);
-        return view('admin.event.show', compact('event'));
+        $setting = Setting::firstOrFail();
+        return view('admin.event.show', compact('event', 'setting'));
     }
     public function create()
     {
-        return view('admin.event.create');
+        $setting = Setting::firstOrFail();
+        return view('admin.event.create', compact('setting'));
     }
 
     public function store(EventStoreRequest $request)
@@ -55,7 +59,8 @@ class EventController extends Controller
     public function edit(Event $event)
     {
         $event = Event::find($event->id);
-        return view('admin.event.edit', compact('event'));
+        $setting = Setting::firstOrFail();
+        return view('admin.event.edit', compact('event', 'setting'));
     }
 
     public function update(EventUpdateRequest $request, Event $event)

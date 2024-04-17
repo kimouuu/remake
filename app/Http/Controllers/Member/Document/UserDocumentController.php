@@ -31,7 +31,7 @@ class UserDocumentController extends Controller
     {
         $setting = Setting::first();
         $types = UserDocumentType::all();
-        return view('member.document.create', compact('types'));
+        return view('member.document.create', compact('types', 'setting'));
     }
 
     public function store(Request $request)
@@ -88,8 +88,9 @@ class UserDocumentController extends Controller
 
     public function edit(UserDocuments $document)
     {
+        $setting = Setting::firstOrFail();
         $types = UserDocumentType::all();
-        return view('member.document.edit', compact('document', 'types'));
+        return view('member.document.edit', compact('document', 'types', 'setting'));
     }
 
     public function update(Request $request, UserDocuments $document)

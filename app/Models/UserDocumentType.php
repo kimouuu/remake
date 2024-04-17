@@ -10,11 +10,17 @@ class UserDocumentType extends Model
     use HasFactory;
     protected $fillable = [
         'name',
-        'status'
+        'status',
+        'type',
     ];
 
     public function userDocument()
     {
         return $this->hasMany(UserDocuments::class);
+    }
+
+    public function userDocumentTypeSelect()
+    {
+        return $this->hasOne(UserDocumentTypeSelect::class);
     }
 }

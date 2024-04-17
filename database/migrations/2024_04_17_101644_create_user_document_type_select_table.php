@@ -11,11 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('user_document_types', function (Blueprint $table) {
+        Schema::create('user_document_type_select', function (Blueprint $table) {
             $table->id();
-            $table->string('name', 255);
-            $table->enum('status', ['required', 'non-required']);
-            $table->enum('type', ['image', 'text', 'select']);
+            $table->foreignId('user_document_type_id')->constrained('user_document_types')->onDelete('cascade');
+            $table->string('select_option', 255);
             $table->timestamps();
         });
     }
@@ -25,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('user_document_types');
+        Schema::dropIfExists('user_document_type_select');
     }
 };

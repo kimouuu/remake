@@ -1,6 +1,7 @@
 @extends('layouts.member.template-member')
 
 @section('content-member')
+<title>Edit Dokumen | {{ $setting->community_name }}</title>
 <div class="container">
     <div class="row">
         <div class="col-md-10">

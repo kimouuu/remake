@@ -12,8 +12,9 @@ class ApprovedUserController extends Controller
 {
     public function index()
     {
+        $setting = Setting::firstOrFail();
         $users = User::where('status', 'process')->get();
-        return view('admin.user-approved.index', compact('users'));
+        return view('admin.user-approved.index', compact('users', 'setting'));
     }
 
     public function update(Request $request, $id)

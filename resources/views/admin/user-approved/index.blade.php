@@ -1,5 +1,6 @@
 @extends('layouts.admin.template-admin')
 @section('content-admin')
+<title>Persetujuan Pengguna | {{ $setting->community_name }}</title>
     <div class="container">
         <h2 class="text-center">List Pengguna</h2>
         <div class="card">

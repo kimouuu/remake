@@ -16,7 +16,8 @@ class RegisterController extends Controller
 {
     public function showRegistrationForm()
     {
-        return view('auth.register.register');
+        $setting = Setting::firstOrFail();
+        return view('auth.register.register', compact('setting'));
     }
 
     public function register(RegisterRequest $request)

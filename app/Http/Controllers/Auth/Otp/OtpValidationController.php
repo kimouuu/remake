@@ -22,11 +22,11 @@ class OtpValidationController extends Controller
 {
     public function index($userId)
     {
-
+        $setting = Setting::firstOrFail();
         $now = now();
         $dataUserOtp = UserOtp::query()->where('user_id', $userId)->latest()->first();
 
-        return view('auth.register.otp', compact('userId', 'now', 'dataUserOtp'));
+        return view('auth.register.otp', compact('userId', 'now', 'dataUserOtp', 'setting'));
     }
 
     public function resendOtpCode($userId)
@@ -82,9 +82,11 @@ class OtpValidationController extends Controller
             ->first();
 
         if (!$checkOtp) {
-            throw ValidationException::withMessages(['otp' => "Kode OTP kamu salah, periksa kembali dan coba lagi"]);
+
+            $this->decrementRetryCount($checkOtp);
+            return redirect()->back()->with('error', "Kode OTP kamu salah, periksa kembali dan coba lagi");
         } elseif ($checkOtp && $now->isAfter($checkOtp->expired_at)) {
-            throw ValidationException::withMessages(['otp' => "Kode OTP kamu sudah kadaluarsa"]);
+            session()->flash('error', "Kode OTP kamu sudah kadaluarsa");
         } else {
             $setting = Setting::firstOrFail();
             $communityName = $setting->community_name;
@@ -121,16 +123,24 @@ class OtpValidationController extends Controller
                 // Redirect to the update profile page
                 return redirect()->route('register.verificationOtp.update', ['userId' => $userId])->with('success', 'Akun anda berhasil dibuat, silahkan lengkapi data diri anda. Terima kasih.');
             } else {
+                $this->decrementRetryCount($checkOtp);
                 return redirect()->back()->with('error', 'Otp tidak valid');
             }
         }
     }
 
+    private function decrementRetryCount($otp)
+    {
+        if ($otp && $otp->retry > 0) {
+            $otp->decrement('retry');
+            $otp->save();
+        }
+    }
     public function update($userId)
     {
         $user = User::findOrFail($userId);
-
-        return view('auth.register.profile', compact('user'));
+        $setting = Setting::firstOrFail();
+        return view('auth.register.profile', compact('user', 'setting'));
     }
 
     public function verified(ProfileUpdateRequest $request, $userId)
@@ -184,8 +194,9 @@ class OtpValidationController extends Controller
 
     public function indexVerifiedMailOtp($userId)
     {
+        $setting = Setting::firstOrFail();
         $userOtp = UserOtp::query()->where('user_id', $userId)->where('otp_type', 'email')->latest()->first();
-        return view('auth.register.mail-otp', compact('userId', 'userOtp'));
+        return view('auth.register.mail-otp', compact('userId', 'userOtp', 'setting'));
     }
 
     public function verifyEmail(Request $request, $userId)

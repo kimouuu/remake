@@ -17,6 +17,7 @@ return new class extends Migration
             $table->enum('otp_type', ['email', 'whatsapp'])->default('whatsapp');
             $table->string('otp');
             $table->boolean('isVerified')->default('0');
+            $table->tinyInteger('retry')->default('3');
             $table->timestamp('expired_at')->nullable();
             $table->timestamps();
         });

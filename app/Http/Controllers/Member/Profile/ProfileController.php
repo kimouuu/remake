@@ -6,20 +6,23 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Member\Profile\ProfileUpdateRequest;
 use App\Http\Requests\Member\Profile\ProfileUpdatePasswordRequest;
 use Illuminate\Support\Facades\Hash;
+use App\Models\Setting;
 use Illuminate\Http\Request;
 
 class ProfileController extends Controller
 {
     public function index()
     {
+        $setting = Setting::firstOrFail();
         $user = auth()->user();
-        return view('member.profile.index', compact('user'));
+        return view('member.profile.index', compact('user', 'setting'));
     }
 
     public function edit()
     {
         $user = auth()->user();
-        return view('member.profile.edit', compact('user'));
+        $setting = Setting::firstOrFail();
+        return view('member.profile.edit', compact('user', 'setting'));
     }
 
     public function update(ProfileUpdateRequest $request)
