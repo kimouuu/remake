@@ -1,7 +1,8 @@
 @extends('layouts.member.template-member')
 @section('content-member')
+<title>Beranda | {{ $setting->community_name }}</title>
     <div class="container">
-        <h1>Dashboard</h1>
+        <h1>Beranda</h1>
         @if (session('success'))
             <div class="alert alert-success">
                 {{ session('success') }}

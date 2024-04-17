@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\News\NewsStoreRequest;
 use App\Http\Requests\Admin\News\NewsUpdateRequest;
 use Illuminate\Support\Str;
+use App\Models\Setting;
 use App\Models\News;
 use Illuminate\Http\Request;
 
@@ -13,19 +14,22 @@ class NewsController extends Controller
 {
     public function index()
     {
+        $setting = Setting::firstOrFail();
         $news = News::all();
-        return view('admin.news.index', compact('news'));
+        return view('admin.news.index', compact('news', 'setting'));
     }
 
     public function show(News $news)
     {
         $news = News::find($news->id);
-        return view('admin.news.show', compact('news'));
+        $setting = Setting::firstOrFail();
+        return view('admin.news.show', compact('news', 'setting'));
     }
 
     public function create()
     {
-        return view('admin.news.create');
+        $setting = Setting::firstOrFail();
+        return view('admin.news.create', compact('setting'));
     }
 
     public function store(NewsStoreRequest $request)
@@ -54,7 +58,8 @@ class NewsController extends Controller
     public function edit(News $news)
     {
         $news = News::find($news->id);
-        return view('admin.news.edit', compact('news'));
+        $setting = Setting::firstOrFail();
+        return view('admin.news.edit', compact('news', 'setting'));
     }
 
     public function update(NewsUpdateRequest $request, News $news)

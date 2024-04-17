@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth\Login;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\Login\HandleLoginRequest;
+use App\Models\Setting;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 
@@ -16,7 +17,8 @@ class LoginController extends Controller
 
     public function login()
     {
-        return view('auth.login.login');
+        $setting = Setting::firstOrFail();
+        return view('auth.login.login', compact('setting'));
     }
 
     public function handleLogin(HandleLoginRequest $request)

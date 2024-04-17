@@ -1,5 +1,6 @@
 @extends('layouts.admin.template-admin')
 @section('content-admin')
+<title>Detail Event | {{ $setting->community_name }}</title>
 <div class="container mt-5">
     <h1>Detail Event</h1>
     <div class="card mb-3" style="max-width: 900px;">

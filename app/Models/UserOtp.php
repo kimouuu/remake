@@ -12,6 +12,7 @@ class UserOtp extends Model
         'user_id',
         'otp_type',
         'otp',
+        'retry',
         'isVerified',
         'expired_at',
     ];

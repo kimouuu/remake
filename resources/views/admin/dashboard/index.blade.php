@@ -1,6 +1,6 @@
 @extends('layouts.admin.template-admin')
 @section('content-admin')
-{{-- <title>{{ $setting->name }} | Dashboard</title> --}}
+<title>Beranda | {{ $setting->community_name }}</title>
 <div class="page-heading">
     <h3>Profile Statistics</h3>
 </div>

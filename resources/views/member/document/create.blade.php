@@ -1,5 +1,6 @@
 @extends('layouts.member.template-member')
 @section('content-member')
+<title>Tambah Dokumen | {{ $setting->community_name }}</title>
     <div class="container">
         <div class="row">
             <div class="col-md-10">
@@ -19,8 +20,9 @@
                                                     <input name="types[{{ $type->type }}]"
                                                         value="{{ $type->id }}"
                                                         data-type-name="{{ $type->name }}"
-                                                        data-type="{{ $type->type === 'image' ? 'file' : 'text' }}"
-                                                        type="checkbox" class="form-check-input"
+                                                        data-type="{{ $type->type === 'image' ? 'file' : ($type->type === 'select' ? 'select' : 'text') }}"
+                                                        type="checkbox"
+                                                        class="form-check-input"
                                                     >
                                                     <label for="type{{ $type->name }}">
                                                         {{ $type->name }}
@@ -41,7 +43,6 @@
                             <div class="form-group" id="inputContainer">
                             </div>
 
-
                             <button type="submit" class="btn btn-primary">Submit</button>
                         </form>
                     </div>
@@ -52,61 +53,64 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            var typeSelect = document.getElementById('user_document_type_id');
-            var fileInputSection = document.getElementById('fileInputSection');
-            var textInputSection = document.getElementById('textInputSection');
+            var checkboxInputs = document.querySelectorAll('input[type="checkbox"]');
+            var inputContainer = document.getElementById('inputContainer');
 
-            typeSelect.addEventListener('change', function() {
-                var selectedOption = typeSelect.options[typeSelect.selectedIndex];
-                var selectedType = selectedOption.getAttribute('data-type');
-
-                // Hide both input sections first
-                fileInputSection.style.display = 'none';
-                textInputSection.style.display = 'none';
-
-                // Show the input section based on the selected option
-                if (selectedType === 'text') {
-                    textInputSection.style.display = 'block';
-                } else if (selectedType === 'image') {
-                    fileInputSection.style.display = 'block';
-                }
+            checkboxInputs.forEach(function(checkbox) {
+                checkbox.addEventListener('change', function() {
+                    displayInputs();
+                });
             });
+
+            function displayInputs() {
+                inputContainer.innerHTML = '';
+
+                checkboxInputs.forEach(function(checkbox) {
+                    if (checkbox.checked) {
+                        var inputType = checkbox.getAttribute('data-type');
+                        var inputTypeName = checkbox.getAttribute('data-type-name');
+                        var label = document.createElement('label');
+                        label.textContent = 'Input for ' + inputTypeName + ': ';
+                        var input;
+
+                        if (inputType === 'file') {
+                            input = document.createElement('input');
+                            input.type = 'file';
+                        } else if (inputType === 'select') {
+                        input = document.createElement('select');
+                        input.name = 'select_option'; // Set nama untuk elemen select
+                        input.classList.add('form-control');
+                        input.setAttribute('required', '');
+
+                        // Ambil opsi-opsi dari server melalui AJAX
+                        fetch('/get-select-options')
+                            .then(response => response.json())
+                            .then(options => {
+                                options.forEach(optionValue => {
+                                    var option = document.createElement('option');
+                                    option.value = optionValue;
+                                    option.textContent = optionValue;
+                                    input.appendChild(option);
+                                });
+                            });
+
+                        } else {
+                            input = document.createElement('input');
+                            input.type = 'text';
+                        }
+
+                        input.name = inputType;
+                        input.classList.add('form-control');
+                        input.setAttribute('required', '');
+                        label.appendChild(input);
+                        inputContainer.appendChild(label);
+                        inputContainer.appendChild(document.createElement('br'));
+                        inputContainer.appendChild(document.createElement('br'));
+                    }
+                });
+            }
+
+            displayInputs();
         });
-
-
-    </script>
-
-    <script>
-        const checkboxInputs = document.querySelectorAll('input[type="checkbox"]');
-
-        checkboxInputs.forEach(checkbox => {
-            checkbox.addEventListener('change', function() {
-                displayInputs();
-            });
-        });
-
-        function displayInputs() {
-            const inputContainer = document.getElementById('inputContainer');
-            inputContainer.innerHTML = '';
-
-            checkboxInputs.forEach(checkbox => {
-                if (checkbox.checked) {
-                    const inputType = checkbox.getAttribute('data-type');
-                    const inputTypeName = checkbox.getAttribute('data-type-name');
-                    const label = document.createElement('label');
-                    label.textContent = `Input for ${inputTypeName}: `;
-                    const input = document.createElement('input');
-                    input.type = inputType === 'file' ? 'file' : 'text';
-                    input.name = inputType;
-                    input.classList.add('form-control');
-                    input.setAttribute('required', '');
-                    label.appendChild(input);
-                    inputContainer.appendChild(label);
-                    inputContainer.appendChild(document.createElement('br'), document.createElement('br'));
-                }
-            });
-        }
-
-        displayInputs();
     </script>
 @endsection

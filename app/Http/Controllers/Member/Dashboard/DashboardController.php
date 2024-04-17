@@ -13,8 +13,9 @@ class DashboardController extends Controller
 {
     public function index()
     {
+        $setting = Setting::firstOrFail();
         $types = UserDocumentType::all();
-        return view('member.dashboard.index', compact('types'));
+        return view('member.dashboard.index', compact('types', 'setting'));
     }
 
     public function register(Request $request)

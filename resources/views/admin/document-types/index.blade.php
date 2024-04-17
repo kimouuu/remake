@@ -1,5 +1,6 @@
 @extends('layouts.admin.template-admin')
 @section('content-admin')
+<title>Jenis Dokumen | {{ $setting->community_name }}</title>
 <div class="">
      <h2>Jenis Dokumen Pengguna</h2>
     <div class="card">

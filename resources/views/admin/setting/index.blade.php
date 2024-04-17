@@ -1,9 +1,10 @@
 @extends('layouts.admin.template-admin')
 @section('content-admin')
+<title>Pengaturan | {{ $setting->community_name }}</title>
     <link rel="stylesheet" href="{{ asset('mazer/assets/extensions/simple-datatables/style.css') }}">
     <link rel="stylesheet" href="{{ asset('mazer/assets/compiled/css/table-datatable.css') }}">
     <div class="">
-        <h2>Setting</h2>
+        <h2>Pengaturan</h2>
         @if ($message = session('success'))
         <div class="alert alert-success" role="alert">
             {{ $message }}

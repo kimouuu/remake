@@ -24,6 +24,7 @@ class DocumentTypeStoreRequest extends FormRequest
         return [
             'name' => 'required|string|max:255',
             'status' => 'required|in:required,non-required',
+            'type' => 'required|in:text,image,select',
         ];
     }
 }
