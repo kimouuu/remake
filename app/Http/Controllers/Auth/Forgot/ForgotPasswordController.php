@@ -79,6 +79,18 @@ class ForgotPasswordController extends Controller
             return back()->with('error', 'Email atau nomor telepon tidak terdaftar.');
         }
 
+        if ($otp = $user->userOtp) {
+            if ($otp->retry <= 0 && $otp->expired_at > now()) {
+                if ($request->via == 'email') {
+                    Mail::to($user->email)->send(new EmailOtpVerification($otp, $user));
+                } elseif ($request->via == 'phone') {
+                    $this->sendOTPviaWhatsApp($user->phone, $otp, Carbon::parse($otp->expired_at)->format('H:i'), 'Nama Komunitas Anda');
+                }
+
+                return to_route('forgot.otp-verification', $user->id);
+            }
+        }
+
         // Generate OTP
         $otp = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
         $expiredAt = now()->addMinutes(5);
@@ -124,14 +136,21 @@ class ForgotPasswordController extends Controller
             'otp' => 'required|digits:6',
         ]);
 
-        $otp = $request->otp;
-
         $userOtp = $user->userOtp()
-            ->where('otp', $otp)
+            ->where('otp', $request->otp)
             ->where('expired_at', '>=', now())
             ->first();
 
+        if ($userOtp && $userOtp->retry <= 0) {
+            return back()->with('error', "Terlalu banyak percobaan, silahkan ulang lagi nanti setelah " . Carbon::parse($userOtp->expired_at)->locale('id_ID')->diffForHumans());
+        }
+
         if (!$userOtp) {
+            $userOtp = $user->userOtp()
+                ->where('isVerified', 0)
+                ->first();
+
+            $this->decrementRetryCount($userOtp);
             return back()->with('error', 'Kode OTP tidak valid atau sudah kadaluarsa.');
         }
 
@@ -140,6 +159,19 @@ class ForgotPasswordController extends Controller
         ]);
 
         return redirect()->route('password.reset', ['token' => $user->email, 'user' => $user->id]);
+    }
+
+    private function decrementRetryCount(UserOtp $otp)
+    {
+        if ($otp && $otp->retry > 0) {
+            $otp->decrement('retry');
+        }
+
+        if ($otp->retry <= 0) {
+            $otp->update([
+                'expired_at' => now()->addDays(1),
+            ]);
+        }
     }
 
     // Kirim OTP via WhatsApp (digunakan saat verifikasi nomor telepon)

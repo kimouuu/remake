@@ -21,7 +21,13 @@
         <div class="alert alert-success" role="alert">
             {{ session('success') }}
         </div>
-    @endif
+        @endif
+
+        @if(session('error'))
+            <div class="alert alert-danger mt-3" role="alert">
+                {{ session('error') }}
+            </div>
+        @endif
         <div class="row h-100">
             <div class="col-lg-5 col-12">
                 <div id="auth-left">
