@@ -34,10 +34,20 @@
                         </div>
                     @endif
 
+                    @php
+                        $tooManyRetries = $user->userOtp->retry <= 0 && $user->userOtp->expired_at > now() ? true : false;
+                    @endphp
+
+                    @if ($user->userOtp->retry <= 0 && $user->userOtp->expired_at > now())
+                        <div class="alert alert-danger mt-3" role="alert">
+                            Limit OTP telah habis, silahkan coba lagi pada {{ \Carbon\Carbon::parse($user->userOtp->expired_at)->format('d F Y') }}
+                        </div>
+                    @endif
+
                     <form action="{{ route('forgot.otp-verification.store', $user->id) }}" method="post">
                         @csrf
                         <div class="form-group position-relative has-icon-left mb-4">
-                            <input type="text" class="form-control form-control-xl" name="otp" placeholder="OTP">
+                            <input type="text" {{ $tooManyRetries ? 'disabled' : '' }} class="form-control form-control-xl" name="otp" placeholder="OTP">
                             <div class="form-control-icon">
                                 @if ($user->userOtp->otp_type == 'email')
                                     <i class="bi bi-envelope"></i>
@@ -46,7 +56,7 @@
                                 @endif
                             </div>
                         </div>
-                        <button class="btn btn-primary btn-block btn-lg shadow-lg mt-3">Submit</button>
+                        <button class="btn btn-primary btn-block btn-lg shadow-lg mt-3" {{ $tooManyRetries ? 'disabled' : '' }}>Submit</button>
                     </form>
 
                     <p class="text-center mt-2" id="otpMessage">
@@ -69,9 +79,16 @@
                     </p>
 
                     <!-- Resend button and countdown -->
-                    <form id="resendOtpForm" action="{{ route('register.verificationOtp.resendOtpCode', $user->id) }}" method="post">
+                    @php
+                        if ($user->userOtp && $user->userOtp->otp_type == 'email') {
+                            $route = route('resend.email.verification', $user->id);
+                        } elseif ($user->userOtp && $user->userOtp->otp_type == 'whatsapp') {
+                            $route = route('register.verificationOtp.resendOtpCode', $user->id);
+                        }
+                    @endphp
+                    <form id="resendOtpForm" action="{{ $route }}" method="post">
                         @csrf
-                        <button id="resendOtpButton" class="btn btn-secondary btn-block btn-lg shadow-lg mt-3">Resend OTP</button>
+                        <button id="resendOtpButton" {{ $tooManyRetries ? 'disabled' : '' }} class="btn btn-secondary btn-block btn-lg shadow-lg mt-3">Resend OTP</button>
                         <p id="countdown" style="display: none;"></p>
                     </form>
                 </div>

@@ -64,14 +64,15 @@ class OtpValidationController extends Controller
 
 
         $http = Http::post($endPoint, $parameter);
+        logger($http);
 
-        if ($http->ok()) {
+        if ($http->ok() && $updateUserOtp) {
             if ($updateUserOtp) {
                 // Use session message for success
                 return back()->with(['success' => "Berhasil mengirim ulang OTP"]);
-            } else {
-                return back()->with(['error' => "Gagal mengirim ulang OTP, periksa koneksi internet anda dan coba lagi."]);
             }
+        } else {
+            return back()->with(['error' => "Gagal mengirim ulang OTP, periksa koneksi internet anda dan coba lagi."]);
         }
     }
     public function verification(OtpValidationRequest $request, $userId)
@@ -81,12 +82,15 @@ class OtpValidationController extends Controller
             ->where('otp', $request->otp)
             ->first();
 
-        if (!$checkOtp) {
-
-            $this->decrementRetryCount($checkOtp);
-            return redirect()->back()->with('error', "Kode OTP kamu salah, periksa kembali dan coba lagi");
-        } elseif ($checkOtp && $now->isAfter($checkOtp->expired_at)) {
-            session()->flash('error', "Kode OTP kamu sudah kadaluarsa");
+        if (!$checkOtp || ($checkOtp && $now->isAfter($checkOtp->expired_at))) {
+            if ($checkOtp) {
+                $checkOtp->decrement('retry');
+            }
+            session()->flash('error', "Kode OTP kamu sudah kadaluarsa atau salah, periksa kembali atau coba lagi");
+        } elseif ($checkOtp->retry <= 0) {
+            session()->flash('error', "Terlalu banyak percobaan, silahkan ulang lagi nanti setelah " . Carbon::parse($checkOtp->expired_at)->locale('id_ID')->diffForHumans());
+        } elseif ($checkOtp->isVerified == 1) {
+            session()->flash('error', "Kode OTP kamu sudah terverifikasi, silahkan login.");
         } else {
             $setting = Setting::firstOrFail();
             $communityName = $setting->community_name;
@@ -123,19 +127,27 @@ class OtpValidationController extends Controller
                 // Redirect to the update profile page
                 return redirect()->route('register.verificationOtp.update', ['userId' => $userId])->with('success', 'Akun anda berhasil dibuat, silahkan lengkapi data diri anda. Terima kasih.');
             } else {
-                $this->decrementRetryCount($checkOtp);
-                return redirect()->back()->with('error', 'Otp tidak valid');
+                return redirect()->route('error', 'Gagal mengirim pesan ke WhatsApp. Silakan coba lagi.');
             }
         }
+        // Kembali ke halaman sebelumnya
+        return redirect()->back();
     }
 
-    private function decrementRetryCount($otp)
+
+    private function decrementRetryCount(UserOtp $otp)
     {
         if ($otp && $otp->retry > 0) {
             $otp->decrement('retry');
-            $otp->save();
+        }
+
+        if ($otp->retry <= 0) {
+            $otp->update([
+                'expired_at' => now()->addDays(1),
+            ]);
         }
     }
+
     public function update($userId)
     {
         $user = User::findOrFail($userId);
