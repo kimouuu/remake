@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple Landing Page</title>
+    <title>Landing Page | {{ $setting->community_name }}</title>
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,600&display=swap" rel="stylesheet" />
 
@@ -72,13 +72,14 @@
         <h1>Welcome to Our Website</h1>
         <img src="{{ asset($setting->image) }}" alt="Placeholder Image" style="max-width: 100%; height: auto;">
     </div>
-
+<br>
+<br
     <div id="about" class="container">
         <h2>About Us</h2>
         <p>{{ $setting->slogan }}</p>
     </div>
     <footer class="footer">
-        <p>&copy; 2024{{ $setting->community_name }}. All rights reserved.</p>
+        <p>&copy; 2024 {{ $setting->community_name }}. All rights reserved.</p>
     </footer>
 </body>
 </html>
