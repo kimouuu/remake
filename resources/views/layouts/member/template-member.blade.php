@@ -24,7 +24,7 @@
                 <div class="header-top">
                     <div class="container">
                         <div class="logo">
-                            <a href="index.html"><img src="{{ asset('setting_image/wayang.png') }}" alt="wayang"></a>
+                            <a href="{{ route('member.dashboard') }}"><img src="{{ asset($setting->image) }}" alt="wayang"></a>
                         </div>
                         <div class="header-top-right">
 
@@ -75,127 +75,6 @@
                                 <a href="{{ route('member.documents.index') }}" class='menu-link'>
                                     <span><i class="bi bi-stack" style="color: orange;"></i> Dokumen</span>
                                 </a>
-                            </li>
-
-
-
-                            <li
-                                class="menu-item active has-sub">
-                                <a href="#" class='menu-link'>
-                                    <span><i class="bi bi-grid-1x2-fill"></i> Layouts</span>
-                                </a>
-                                <div
-                                    class="submenu ">
-                                    <!-- Wrap to submenu-group-wrapper if you want 3-level submenu. Otherwise remove it. -->
-                                    <div class="submenu-group-wrapper">
-
-
-                                        <ul class="submenu-group">
-
-                                            <li
-                                                class="submenu-item  ">
-                                                <a href="layout-default.html"
-                                                    class='submenu-link'>Default Layout</a>
-                                            </li>
-
-                                            <li
-                                                class="submenu-item">
-                                                <a href="layout-vertical-1-column.html"
-                                                    class='submenu-link'>1 Column</a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </li>
-
-
-
-                            <li
-                                class="menu-item  has-sub">
-                                <a href="#" class='menu-link'>
-                                    <span><i class="bi bi-file-earmark-medical-fill"></i> Forms</span>
-                                </a>
-                                <div
-                                    class="submenu ">
-                                    <!-- Wrap to submenu-group-wrapper if you want 3-level submenu. Otherwise remove it. -->
-                                    <div class="submenu-group-wrapper">
-
-
-                                        <ul class="submenu-group">
-
-                                            <li
-                                                class="submenu-item  has-sub">
-                                                <a href="#"
-                                                    class='submenu-link'>Profile Document</a>
-
-
-                                                <!-- 3 Level Submenu -->
-                                                <ul class="subsubmenu">
-
-                                                    <li class="subsubmenu-item ">
-                                                        <a href="{{ route('member.documents.index') }}" class="subsubmenu-link">Input</a>
-                                                    </li>
-
-                                                    <li class="subsubmenu-item ">
-                                                        <a href="form-element-input-group.html" class="subsubmenu-link">Input Group</a>
-                                                    </li>
-
-                                                </ul>
-
-                                            </li>
-
-
-
-                                            <li
-                                                class="submenu-item  ">
-                                                <a href="form-layout.html"
-                                                    class='submenu-link'>Form Layout</a>
-                                            </li>
-
-                                            <li
-                                                class="submenu-item  has-sub">
-                                                <a href="#"
-                                                    class='submenu-link'>Form Validation</a>
-
-
-                                                <!-- 3 Level Submenu -->
-                                                <ul class="subsubmenu">
-
-                                                    <li class="subsubmenu-item ">
-                                                        <a href="form-validation-parsley.html" class="subsubmenu-link">Parsley</a>
-                                                    </li>
-
-                                                </ul>
-
-                                            </li>
-
-
-
-                                            <li
-                                                class="submenu-item  has-sub">
-                                                <a href="#"
-                                                    class='submenu-link'>Form Editor</a>
-
-
-                                                <!-- 3 Level Submenu -->
-                                                <ul class="subsubmenu">
-
-                                                    <li class="subsubmenu-item ">
-                                                        <a href="form-editor-quill.html" class="subsubmenu-link">Quill</a>
-                                                    </li>
-
-                                                    <li class="subsubmenu-item ">
-                                                        <a href="form-editor-ckeditor.html" class="subsubmenu-link">CKEditor</a>
-                                                    </li>
-
-                                                </ul>
-
-                                            </li>
-
-                                        </ul>
-
-                                    </div>
-                                </div>
                             </li>
 
                         </ul>

@@ -44,7 +44,6 @@
                         </div>
                         <button class="btn btn-primary btn-block btn-lg shadow-lg mt-3">Submit</button>
                     </form>
-
                     <p class="text-center mt-2" id="otpMessage">
                         @php
                             $user = \App\Models\User::find($userId);
@@ -55,6 +54,7 @@
                             <span id="censoredEmailLink" data-censored-email="{{ $censoredEmail }}"></span>
                         @endif
                     </p>
+
 
                     <!-- Resend button and countdown -->
                     <form id="resendOtpForm" action="{{ route('resend.email.verification', $userId) }}" method="post">
@@ -72,22 +72,22 @@
     </div>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            @if ($user->userOtp)
+            @if ($user)
                 var expiredAt = '{{ $user->userOtp->expired_at }}';
-                var censoredContact = document.getElementById('censoredContact');
+                var censoredEmailLink = document.getElementById('censoredEmailLink');
                 var resendButton = document.getElementById('resendOtpButton');
                 var countdownElement = document.getElementById('countdown');
 
                 function updateCountdown() {
                     var remainingTime = new Date(expiredAt) - new Date();
-                    var minutes = Math.floor(remainingTime / (1000 * 60)); // Konversi milidetik ke menit
-                    var seconds = Math.floor((remainingTime % (1000 * 60)) / 1000); // Sisa waktu dalam detik
+                    var hours = Math.floor(remainingTime / (1000 * 60 * 60)); // Konversi milidetik ke jam
+                    var minutes = Math.floor((remainingTime % (1000 * 60 * 60)) / (1000 * 60)); // Sisa waktu dalam menit
 
-                    if (minutes <= 0 && seconds <= 0) {
+                    if (hours <= 0 && minutes <= 0) {
                         enableResendButton();
                     } else {
                         countdownElement.style.display = 'block';
-                        countdownElement.innerText = 'Resend OTP in ' + minutes + ' menit ' + seconds + ' detik';
+                        countdownElement.innerText = 'Resend OTP in ' + hours + ' jam ' + minutes + ' menit';
                     }
                 }
 
@@ -101,10 +101,10 @@
 
                 // Menyesuaikan teks tergantung pada tipe OTP
                 if (otpType === 'email') {
-                    censoredContact.innerText = '*Kode OTP terkirim ke ' + '{{ $user->email }}' + ' via email.';
+                    censoredEmailLink.innerText = '*Kode OTP terkirim ke ' + '{{ $user->email }}' + ' via email.';
                 } else if (otpType === 'whatsapp') {
                     // Ganti '{{ $user->email }}' dengan atribut yang sesuai untuk nomor telepon atau email WhatsApp jika diperlukan
-                    censoredContact.innerText = '*Kode OTP terkirim ke ' + '{{ $user->phone }}' + ' via WhatsApp.';
+                    censoredEmailLink.innerText = '*Kode OTP terkirim ke ' + '{{ $user->phone }}' + ' via WhatsApp.';
                 }
 
                 // Tambahkan countdown
@@ -121,7 +121,6 @@
             @endif
         });
     </script>
-
-
 </body>
+
 </html>

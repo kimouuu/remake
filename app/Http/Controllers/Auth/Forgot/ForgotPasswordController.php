@@ -141,7 +141,7 @@ class ForgotPasswordController extends Controller
             ->where('expired_at', '>=', now())
             ->first();
 
-        if ($userOtp && $userOtp->retry <= 0) {
+        if ($userOtp && $userOtp->retry = 1) {
             return back()->with('error', "Terlalu banyak percobaan, silahkan ulang lagi nanti setelah " . Carbon::parse($userOtp->expired_at)->locale('id_ID')->diffForHumans());
         }
 

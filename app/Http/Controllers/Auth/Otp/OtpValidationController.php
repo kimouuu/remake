@@ -82,10 +82,7 @@ class OtpValidationController extends Controller
             ->where('otp', $request->otp)
             ->first();
 
-        if (!$checkOtp || ($checkOtp && $now->isAfter($checkOtp->expired_at))) {
-            if ($checkOtp) {
-                $checkOtp->decrement('retry');
-            }
+        if (!$checkOtp || ($checkOtp && $now->isAfter($checkOtp->expired_at))) {;
             session()->flash('error', "Kode OTP kamu sudah kadaluarsa atau salah, periksa kembali atau coba lagi");
         } elseif ($checkOtp->retry <= 0) {
             session()->flash('error', "Terlalu banyak percobaan, silahkan ulang lagi nanti setelah " . Carbon::parse($checkOtp->expired_at)->locale('id_ID')->diffForHumans());
@@ -123,8 +120,7 @@ class OtpValidationController extends Controller
                 ]);
 
                 $checkOtp->delete();
-
-                // Redirect to the update profile page
+                $this->decrementRetryCount($checkOtp);
                 return redirect()->route('register.verificationOtp.update', ['userId' => $userId])->with('success', 'Akun anda berhasil dibuat, silahkan lengkapi data diri anda. Terima kasih.');
             } else {
                 return redirect()->route('error', 'Gagal mengirim pesan ke WhatsApp. Silakan coba lagi.');
