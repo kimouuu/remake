@@ -73,7 +73,7 @@
         <img src="{{ asset($setting->image) }}" alt="Placeholder Image" style="max-width: 100%; height: auto;">
     </div>
 <br>
-<br>
+
     <div id="about" class="container">
         <h2>About Us</h2>
         <p>{{ $setting->slogan }}</p>
