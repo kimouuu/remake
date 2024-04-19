@@ -26,7 +26,7 @@
             <div class="col-lg-5 col-12">
                 <div id="auth-left">
                     <div class="auth-logo">
-                        <a href="#"></a>
+                        <a href="{{ route('welcome') }}"><img src="{{ asset($setting->image) }}" alt="Logo"></a>
                     </div>
                     <h2 class="auth-title">Masuk</h2>
                     <form action="{{ route('login') }}" method="post">

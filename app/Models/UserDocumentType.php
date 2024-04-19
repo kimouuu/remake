@@ -21,6 +21,6 @@ class UserDocumentType extends Model
 
     public function userDocumentTypeSelect()
     {
-        return $this->hasOne(UserDocumentTypeSelect::class);
+        return $this->hasMany(UserDocumentTypeSelect::class);
     }
 }

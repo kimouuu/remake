@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\UserDocumentType\DocumentTypeStoreRequest;
 use App\Models\UserDocumentType;
 use App\Models\Setting;
+use Illuminate\Support\Facades\Validator;
 use App\Models\UserDocumentTypeSelect;
 use Illuminate\Http\Request;
 
@@ -24,29 +25,85 @@ class DocumentTypeController extends Controller
         return view('admin.document-types.create', compact('setting'));
     }
 
+
     public function store(Request $request)
     {
         // Validasi data formulir
-        $validatedData = $request->validate([
+        $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'status' => 'required|in:required,non-required',
             'type' => 'required|in:text,image,select',
-            'select_options' => 'required_if:type,select|array', // Hanya diperlukan jika tipe adalah 'select'
-            'select_options.*' => 'string|max:255' // Validasi setiap nilai opsi pilihan
         ]);
 
-        // Buat entri baru dalam tabel 'user_document_types'
+        // Cek jika validasi gagal
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
+        // Lanjutkan menyimpan data jika validasi berhasil
         $userDocumentType = UserDocumentType::create([
-            'name' => $validatedData['name'],
-            'status' => $validatedData['status'],
-            'type' => $validatedData['type']
+            'name' => $request->name,
+            'status' => $request->status,
+            'type' => $request->type
         ]);
 
-        // Jika tipe yang dipilih adalah 'select'
-        if ($validatedData['type'] === 'select') {
-            // Buat entri baru dalam tabel 'user_document_type_select' dan hubungkan dengan 'user_document_type'
-            foreach ($validatedData['select_options'] as $selectOption) {
-                $userDocumentType->userDocumentTypeSelect()->create([
+        // Jika tipe yang dipilih adalah 'select', simpan juga pilihan-pilihannya
+        if ($request->type === 'select') {
+            $selectOptions = $request->select_options;
+            $userDocumentTypeSelect = [];
+            foreach ($selectOptions as $option) {
+                $userDocumentTypeSelect[] = new UserDocumentTypeSelect([
+                    'select_option' => $option
+                ]);
+            }
+            $userDocumentType->userDocumentTypeSelect()->saveMany($userDocumentTypeSelect);
+        }
+
+        // Redirect ke halaman yang sesuai
+        return redirect()->route('admin.document-types.index');
+    }
+
+    public function edit($id)
+    {
+        $documentType = UserDocumentType::with('userDocumentTypeSelect')->findOrFail($id);
+
+        $setting = Setting::firstOrFail();
+        return view('admin.document-types.edit', compact('documentType', 'setting'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        // Validasi data formulir
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'status' => 'required|in:required,non-required',
+            'type' => 'required|in:text,image,select',
+        ]);
+
+        // Cek jika validasi gagal
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
+        if ($request->input('type') === 'select') {
+            $request->validate([
+                'select_options' => 'required|array',
+                'select_options.*' => 'string|max:255'
+            ]);
+        }
+
+        // Perbarui data jenis dokumen
+        $documentType = UserDocumentType::findOrFail($id);
+        $documentType->name = $request->name;
+        $documentType->status = $request->status;
+        $documentType->type = $request->type;
+        $documentType->save();
+
+        // Perbarui opsi select jika tipe adalah 'select'
+        if ($request->input('type') === 'select') {
+            $documentType->userDocumentTypeSelect()->delete(); // Hapus opsi yang ada
+            foreach ($request->select_options as $selectOption) {
+                $documentType->userDocumentTypeSelect()->create([
                     'select_option' => $selectOption
                 ]);
             }
@@ -56,19 +113,6 @@ class DocumentTypeController extends Controller
         return redirect()->route('admin.document-types.index');
     }
 
-
-
-    public function edit(UserDocumentType $documentType)
-    {
-        $setting = Setting::firstOrFail();
-        return view('admin.document-types.edit', compact('documentType', 'setting'));
-    }
-
-    public function update(DocumentTypeStoreRequest $request, UserDocumentType $documentType)
-    {
-        $documentType->update($request->validated());
-        return redirect()->route('admin.document-types.index');
-    }
 
     public function destroy(UserDocumentType $documentType)
     {
